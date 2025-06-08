@@ -20,6 +20,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["src", "components", "hooks", "lib"],
+  "include": ["src", "components", "lib"],
   "exclude": ["node_modules"]
 }
