@@ -4,8 +4,6 @@ import animate from "tailwindcss-animate"
 
 const config: Config = {
   darkMode: "class",
-
-  // Tell Tailwind where to find your templates so it can tree-shake unused styles
   content: [
     "./index.html",                // your main HTML
     "./src/**/*.{js,ts,jsx,tsx}",  // all JS/TS(x) files in src/
@@ -89,7 +87,6 @@ const config: Config = {
 
   plugins: [
     animate,
-    // add other shadcn/ui or official Tailwind plugins here as needed
   ],
 }
 
