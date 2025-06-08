@@ -1,5 +1,5 @@
 // src/server/db.ts
-import prisma from "@/src/lib/prisma";
+import prisma from "@/lib/prisma";
 
 export const db = {
   // get all folders under a given folderId

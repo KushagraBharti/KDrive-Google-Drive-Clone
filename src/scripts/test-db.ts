@@ -2,18 +2,27 @@
 import "dotenv/config";
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl     = process.env.VITE_SUPABASE_URL!;
-const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY!;
+const url        = process.env.VITE_SUPABASE_URL;
+const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+console.log("→ URL:", url);
+console.log("→ Service Key defined?:", !!serviceKey);
+
+if (!url || !serviceKey) {
+  console.error("❌ Missing one of VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
+  process.exit(1);
+}
+
+const supabase = createClient(url, serviceKey);
 
 async function main() {
-  const { data, error } = await supabase.from("Folder").select("*");
+  const { data, error } = await supabase.from("folder").select("*");
   if (error) {
     console.error("❌ Supabase error:", error);
     process.exit(1);
   }
-  console.log("✅ Supabase connected. Folders:", data);
+  console.log("✅ Success:", data);
+  process.exit(0);
 }
 
 main();
