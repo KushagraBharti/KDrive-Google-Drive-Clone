@@ -26,7 +26,9 @@ import {
   MoreVertical,
   Home,
   ChevronRight,
+  Cloud,
 } from "lucide-react"
+import { useAuth } from '@/hooks/useAuth'
 
 function formatBytes(bytes: number) {
   if (bytes === 0) return "0 B"
@@ -42,6 +44,9 @@ interface Crumb {
 }
 
 export default function DriveView() {
+
+  const { signOut } = useAuth()
+
   const { folderId = "root" } = useParams<{ folderId: string }>()
   const navigate = useNavigate()
   const location = useLocation()
@@ -90,12 +95,13 @@ export default function DriveView() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      <Navbar />
-
       <div className="bg-slate-800/80 backdrop-blur-sm border-b border-slate-700/50 px-6 py-4 shadow-lg">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold text-white tracking-tight">Drive</h1>
+            <div className="flex items-center space-x-2">
+              <Cloud className="w-5 h-5 text-white" />
+              <span className="text-lg font-bold text-white">KDrive</span>
+            </div>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
               <Input
@@ -111,15 +117,21 @@ export default function DriveView() {
               variant="outline"
               size="icon"
               onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
-              className="bg-slate-700/50 border-slate-600 text-slate-300 hover:bg-slate-600 hover:text-white transition-all duration-200"
+              className="w-16 h-10 p-0 bg-slate-700/50 border-slate-600 text-slate-300 hover:bg-slate-600 hover:text-white transition-all duration-200 flex items-center justify-center"
             >
               {viewMode === "grid" ? (
-                <List className="w-4 h-4" />
+                <List className="w-8 h-8" />
               ) : (
-                <Grid3X3 className="w-4 h-4" />
+                <Grid3X3 className="w-8 h-8" />
               )}
             </Button>
             <UploadButton parentId={parentId ?? 0} />
+            <Button 
+              variant="default" 
+              onClick={signOut} 
+              className="w-28 h-9.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium transition-all duration-200">
+              Sign Out
+            </Button>
           </div>
         </div>
       </div>
@@ -131,7 +143,7 @@ export default function DriveView() {
               {index === 0 && <Home className="w-4 h-4 text-slate-400" />}
               <button
                 onClick={() => navigateToBreadcrumb(index)}
-                className="text-slate-300 hover:text-blue-400 hover:underline transition-colors duration-200 font-medium"
+                className="text-slate-300 hover:text-blue-400 transition-colors duration-200 font-medium"
               >
                 {crumb.name}
               </button>
