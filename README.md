@@ -32,3 +32,11 @@ Users can browse nested folders, upload files, and persist everything in your ow
    ```bash
    yarn build
    ```
+
+4. **Configure Supabase**
+   1. Create a new project at [Supabase](https://supabase.com) and copy the project URL and anon key.
+   2. Copy `.env.example` to `.env` inside the `frontend` directory and fill in your credentials:
+      ```bash
+      cp frontend/.env.example frontend/.env
+      ```
+      Then edit `frontend/.env` and set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
