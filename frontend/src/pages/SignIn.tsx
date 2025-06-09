@@ -261,6 +261,4 @@ export default function SignInPage() {
       </div>
     </div>
   )
-
-  export default function SignIn() {}
-
+}
