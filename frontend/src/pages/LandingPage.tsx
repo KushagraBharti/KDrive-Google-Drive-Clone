@@ -159,7 +159,7 @@ export default function LandingPage() {
             {features.map((feature, index) => (
               <Card
                 key={index}
-                className="bg-slate-800/60 border-slate-700/50 hover:bg-slate-700/60 hover:border-slate-600 transition-all duration-300 transform hover:scale-105 animate-in fade-in slide-in-from-bottom-4 duration-700"
+                className="bg-slate-800/60 border-slate-700/50 hover:bg-slate-700/60 hover:border-slate-600 transition-all duration-300 transform hover:scale-105 animate-in fade-in slide-in-from-bottom-4"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <CardContent className="p-6 text-center">
@@ -185,7 +185,7 @@ export default function LandingPage() {
             {testimonials.map((testimonial, index) => (
               <Card
                 key={index}
-                className="bg-slate-800/60 border-slate-700/50 hover:bg-slate-700/60 transition-all duration-300 animate-in fade-in slide-in-from-bottom-4 duration-700"
+                className="bg-slate-800/60 border-slate-700/50 hover:bg-slate-700/60 transition-all duration-300 animate-in fade-in slide-in-from-bottom-4"
                 style={{ animationDelay: `${index * 150}ms` }}
               >
                 <CardContent className="p-6">
