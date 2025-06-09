@@ -1,14 +1,28 @@
-"use client"
+// frontend/src/App.tsx
+/* eslint-disable react/jsx-no-useless-fragment */
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
 
-import { useState } from "react"
-import DriveView from "@/pages/DriveView"
 import LandingPage from "@/pages/LandingPage"
 import SignIn from "@/pages/SignIn"
+import DriveView from "@/pages/DriveView"
 
 export default function App() {
-  const [page, setPage] = useState<'landing' | 'signin' | 'drive'>('drive')
+  return (
+    <Router>
+      <Routes>
+        {/* Public routes */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/signin" element={<SignIn />} />
 
-  if (page === 'landing') return <LandingPage />
-  if (page === 'signin') return <SignIn />
-  return <DriveView />
+        {/* Drive - root alias */}
+        <Route path="/drive" element={<Navigate to="/drive/root" replace />} />
+
+        {/* Drive - nested folders */}
+        <Route path="/drive/:folderId/*" element={<DriveView />} />
+
+        {/* Catch-all → home */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Router>
+  )
 }

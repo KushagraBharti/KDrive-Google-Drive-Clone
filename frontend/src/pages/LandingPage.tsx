@@ -22,7 +22,7 @@ export default function LandingPage() {
     {
       icon: <Zap className="w-8 h-8 text-yellow-400" />,
       title: "Lightning Fast",
-      description: "Upload, download, and sync your files at blazing speeds with our optimized infrastructure.",
+      description: "Upload, download, and sync your files at blazing speeds with our infrastructure.",
     },
     {
       icon: <Users className="w-8 h-8 text-purple-400" />,
@@ -49,7 +49,7 @@ export default function LandingPage() {
       name: "Emily Watson",
       role: "Startup Founder",
       content: "The security features give me confidence to store sensitive business documents. Highly recommended!",
-      rating: 5,
+      rating: 4,
     },
   ]
 
@@ -65,18 +65,6 @@ export default function LandingPage() {
             <span className="text-2xl font-bold text-white">KDrive</span>
           </div>
           <div className="flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              className="text-slate-300 hover:text-white hover:bg-slate-700 transition-all duration-200"
-            >
-              Features
-            </Button>
-            <Button
-              variant="ghost"
-              className="text-slate-300 hover:text-white hover:bg-slate-700 transition-all duration-200"
-            >
-              Pricing
-            </Button>
             <Button
               variant="outline"
               className="bg-slate-700/50 border-slate-600 text-slate-300 hover:bg-slate-600 hover:text-white transition-all duration-200"
@@ -122,22 +110,19 @@ export default function LandingPage() {
           <div className="mt-16 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-400">
             <div className="relative max-w-4xl mx-auto">
               <div className="bg-gradient-to-r from-slate-800/60 to-slate-700/60 backdrop-blur-sm rounded-2xl border border-slate-600/50 p-8 shadow-2xl">
-                <div className="grid grid-cols-3 gap-4 mb-6">
-                  <div className="flex items-center space-x-2 bg-slate-700/50 rounded-lg p-3">
+                <div className="grid items-center justify-center grid-cols-3 gap-4 mb-6">
+                  <div className="flex items-center space-x-2 bg-slate-700/50 rounded-lg p-3 hover:bg-slate-600 transition-all duration-200">
                     <Folder className="w-6 h-6 text-blue-400" />
                     <span className="text-slate-200 font-medium">Documents</span>
                   </div>
-                  <div className="flex items-center space-x-2 bg-slate-700/50 rounded-lg p-3">
+                  <div className="flex items-center space-x-2 bg-slate-700/50 rounded-lg p-3 hover:bg-slate-600 transition-all duration-200">
                     <Upload className="w-6 h-6 text-emerald-400" />
                     <span className="text-slate-200 font-medium">Upload</span>
                   </div>
-                  <div className="flex items-center space-x-2 bg-slate-700/50 rounded-lg p-3">
+                  <div className="flex items-center space-x-2 bg-slate-700/50 rounded-lg p-3 hover:bg-slate-600 transition-all duration-200">
                     <Share className="w-6 h-6 text-purple-400" />
                     <span className="text-slate-200 font-medium">Share</span>
                   </div>
-                </div>
-                <div className="h-32 bg-gradient-to-r from-slate-600/30 to-slate-500/30 rounded-lg flex items-center justify-center">
-                  <p className="text-slate-300 text-lg">Beautiful, intuitive interface</p>
                 </div>
               </div>
             </div>
@@ -159,11 +144,11 @@ export default function LandingPage() {
             {features.map((feature, index) => (
               <Card
                 key={index}
-                className="bg-slate-800/60 border-slate-700/50 hover:bg-slate-700/60 hover:border-slate-600 transition-all duration-300 transform hover:scale-105 animate-in fade-in slide-in-from-bottom-4"
+                className="h-64 flex items-center justify-center bg-slate-800/60 border-slate-700/50 hover:bg-slate-700/60 hover:border-slate-600 transition-all duration-300 transform hover:scale-105 animate-in fade-in slide-in-from-bottom-4 bg-center"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <CardContent className="p-6 text-center">
-                  <div className="mb-4 flex justify-center">{feature.icon}</div>
+                <CardContent className="flex flex-col items-center justify-center p-6 text-center w-full h-full">
+                  <div className="mb-4 flex justify-center items-center w-full">{feature.icon}</div>
                   <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
                   <p className="text-slate-300 leading-relaxed">{feature.description}</p>
                 </CardContent>
@@ -180,16 +165,15 @@ export default function LandingPage() {
             <h2 className="text-4xl font-bold text-white mb-4">Loved by thousands</h2>
             <p className="text-xl text-slate-300">See what our users have to say about KDrive.</p>
           </div>
-
           <div className="grid md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
               <Card
                 key={index}
-                className="bg-slate-800/60 border-slate-700/50 hover:bg-slate-700/60 transition-all duration-300 animate-in fade-in slide-in-from-bottom-4"
+                className="h-64 bg-slate-800/60 border-slate-700/50 hover:bg-slate-700/60 transition-all duration-300 animate-in fade-in slide-in-from-bottom-4"
                 style={{ animationDelay: `${index * 150}ms` }}
               >
-                <CardContent className="p-6">
-                  <div className="flex mb-4">
+                <CardContent className="flex flex-col items-center justify-center p-6 text-center w-full h-full">
+                  <div className="flex mb-4 justify-center items-center w-full">
                     {[...Array(testimonial.rating)].map((_, i) => (
                       <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
                     ))}
