@@ -1,0 +1,47 @@
+// schema.prisma
+// Prisma schema with explicit lowercase table mappings for PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Folder {
+  id        Int       @id @default(autoincrement())
+  name      String
+  parentId  Int?
+  ownerId   String
+  createdAt DateTime  @default(now())
+
+  // Self-relation: one parent → many children
+  parent   Folder?   @relation("FolderChildren", fields: [parentId], references: [id])
+  children Folder[]  @relation("FolderChildren")
+
+  // Files in this folder
+  files    File[]
+
+  @@index([parentId])
+  @@index([ownerId])
+  @@map("folder")    // Map this model to the lowercase "folder" table
+}
+
+model File {
+  id        Int      @id @default(autoincrement())
+  name      String
+  size      Int
+  url       String
+  parentId  Int
+  ownerId   String
+  createdAt DateTime @default(now())
+
+  // Each file belongs to exactly one folder
+  parent    Folder   @relation(fields: [parentId], references: [id])
+
+  @@index([parentId])
+  @@index([ownerId])
+  @@map("file")      // Map this model to the lowercase "file" table
+}

@@ -1,6 +1,19 @@
 # KDrive - Google Drive Clone
 
-A simple Google Drive clone built with React, TypeScript and Vite.
+A toy Google-Drive-style app built with React + TypeScript, Vite, Supabase, Prisma, Tailwind CSS and PostHog.  
+Users can browse nested folders, upload files, and persist everything in your own Supabase-hosted PostgreSQL.
+
+---
+
+## 🚀 Tech Stack
+
+- **Frontend**: Vite → React 18, TypeScript, Tailwind CSS v3, shadcn/ui, lucide-react  
+- **Backend / DB**: Supabase (Postgres), Prisma ORM  
+- **Auth & Storage**: Supabase Auth (magic links/OAuth) & Storage (presigned uploads)  
+- **Analytics**: PostHog via React SDK + `/ingest` proxy  
+- **Deploy & CI**: Vercel (auto-deploy) + GitHub Actions (typecheck + lint)
+
+---
 
 ## Getting Started
 
