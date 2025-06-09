@@ -5,9 +5,35 @@ export interface FolderCardProps {
   name: string
   modified?: string
   onClick?: () => void
+  view?: 'grid' | 'list'
 }
 
-export default function FolderCard({ name, modified, onClick }: FolderCardProps) {
+export default function FolderCard({
+  name,
+  modified,
+  onClick,
+  view = 'list',
+}: FolderCardProps) {
+  if (view === 'grid') {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className="flex flex-col items-center justify-center space-y-2 w-full"
+      >
+        <Folder className="w-12 h-12 text-blue-400" />
+        <span className="text-sm font-medium text-slate-200 truncate w-full text-center">
+          {name}
+        </span>
+        {modified && (
+          <span className="text-xs text-slate-400 truncate w-full text-center">
+            {modified}
+          </span>
+        )}
+      </button>
+    )
+  }
+
   return (
     <button
       type="button"

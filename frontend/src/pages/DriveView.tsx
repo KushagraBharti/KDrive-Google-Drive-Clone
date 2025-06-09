@@ -1,198 +1,109 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useParams, useNavigate, useLocation } from "react-router-dom"
+import Navbar from "@/components/Navbar"
+import FolderCard from "@/components/FolderCard"
+import FileCard from "@/components/FileCard"
+import UploadButton from "@/components/UploadButton"
+import { useFolders } from "@/hooks/useFolders"
+import { useFiles } from "@/hooks/useFiles"
+import { useUpload } from "@/hooks/useUpload"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import {
-  Folder,
-  File,
-  FileText,
-  ImageIcon,
-  Video,
-  Music,
-  Archive,
-  Upload,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  Folder as FolderIcon,
   Search,
   Grid3X3,
   List,
   MoreVertical,
   Home,
   ChevronRight,
-  Plus,
+  Cloud,
 } from "lucide-react"
+import { useAuth } from '@/hooks/useAuth'
 
-// Mock data structure (keeping the same data)
-const mockData = {
-  "/": {
-    name: "My Drive",
-    items: [
-      { id: "1", name: "Documents", type: "folder", path: "/Documents" },
-      { id: "2", name: "Photos", type: "folder", path: "/Photos" },
-      { id: "3", name: "Projects", type: "folder", path: "/Projects" },
-      { id: "4", name: "Resume.pdf", type: "file", size: "245 KB", modified: "Oct 15, 2024" },
-      { id: "5", name: "Presentation.pptx", type: "file", size: "2.1 MB", modified: "Oct 12, 2024" },
-      { id: "6", name: "Budget.xlsx", type: "file", size: "89 KB", modified: "Oct 10, 2024" },
-    ],
-  },
-  "/Documents": {
-    name: "Documents",
-    items: [
-      { id: "7", name: "Work", type: "folder", path: "/Documents/Work" },
-      { id: "8", name: "Personal", type: "folder", path: "/Documents/Personal" },
-      { id: "9", name: "Report.docx", type: "file", size: "156 KB", modified: "Oct 14, 2024" },
-      { id: "10", name: "Notes.txt", type: "file", size: "12 KB", modified: "Oct 13, 2024" },
-    ],
-  },
-  "/Documents/Work": {
-    name: "Work",
-    items: [
-      { id: "11", name: "Meeting Notes.docx", type: "file", size: "78 KB", modified: "Oct 16, 2024" },
-      { id: "12", name: "Project Plan.pdf", type: "file", size: "234 KB", modified: "Oct 15, 2024" },
-      { id: "13", name: "Contracts", type: "folder", path: "/Documents/Work/Contracts" },
-    ],
-  },
-  "/Documents/Work/Contracts": {
-    name: "Contracts",
-    items: [
-      { id: "14", name: "Client Agreement.pdf", type: "file", size: "445 KB", modified: "Oct 8, 2024" },
-      { id: "15", name: "NDA.pdf", type: "file", size: "123 KB", modified: "Oct 5, 2024" },
-    ],
-  },
-  "/Documents/Personal": {
-    name: "Personal",
-    items: [
-      { id: "16", name: "Travel Plans.docx", type: "file", size: "67 KB", modified: "Oct 11, 2024" },
-      { id: "17", name: "Shopping List.txt", type: "file", size: "3 KB", modified: "Oct 9, 2024" },
-    ],
-  },
-  "/Photos": {
-    name: "Photos",
-    items: [
-      { id: "18", name: "Vacation 2024", type: "folder", path: "/Photos/Vacation 2024" },
-      { id: "19", name: "Family", type: "folder", path: "/Photos/Family" },
-      { id: "20", name: "sunset.jpg", type: "file", size: "2.3 MB", modified: "Oct 7, 2024" },
-      { id: "21", name: "portrait.png", type: "file", size: "1.8 MB", modified: "Oct 6, 2024" },
-    ],
-  },
-  "/Photos/Vacation 2024": {
-    name: "Vacation 2024",
-    items: [
-      { id: "22", name: "beach.jpg", type: "file", size: "3.1 MB", modified: "Sep 20, 2024" },
-      { id: "23", name: "mountains.jpg", type: "file", size: "2.8 MB", modified: "Sep 19, 2024" },
-      { id: "24", name: "city.jpg", type: "file", size: "2.5 MB", modified: "Sep 18, 2024" },
-    ],
-  },
-  "/Photos/Family": {
-    name: "Family",
-    items: [
-      { id: "25", name: "birthday.jpg", type: "file", size: "1.9 MB", modified: "Aug 15, 2024" },
-      { id: "26", name: "reunion.jpg", type: "file", size: "2.2 MB", modified: "Aug 10, 2024" },
-    ],
-  },
-  "/Projects": {
-    name: "Projects",
-    items: [
-      { id: "27", name: "Website Redesign", type: "folder", path: "/Projects/Website Redesign" },
-      { id: "28", name: "Mobile App", type: "folder", path: "/Projects/Mobile App" },
-      { id: "29", name: "project-archive.zip", type: "file", size: "15.2 MB", modified: "Oct 1, 2024" },
-    ],
-  },
-  "/Projects/Website Redesign": {
-    name: "Website Redesign",
-    items: [
-      { id: "30", name: "wireframes.pdf", type: "file", size: "890 KB", modified: "Oct 3, 2024" },
-      { id: "31", name: "mockups.psd", type: "file", size: "12.5 MB", modified: "Oct 2, 2024" },
-    ],
-  },
-  "/Projects/Mobile App": {
-    name: "Mobile App",
-    items: [
-      { id: "32", name: "app-demo.mp4", type: "file", size: "45.2 MB", modified: "Sep 28, 2024" },
-      { id: "33", name: "requirements.docx", type: "file", size: "234 KB", modified: "Sep 25, 2024" },
-    ],
-  },
+function formatBytes(bytes: number) {
+  if (bytes === 0) return "0 B"
+  const k = 1024
+  const sizes = ["B", "KB", "MB", "GB", "TB"]
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`
 }
 
-function getFileIcon(fileName: string) {
-  const extension = fileName.split(".").pop()?.toLowerCase()
-
-  switch (extension) {
-    case "pdf":
-    case "doc":
-    case "docx":
-    case "txt":
-      return <FileText className="w-8 h-8 text-blue-400 transition-colors duration-200" />
-    case "jpg":
-    case "jpeg":
-    case "png":
-    case "gif":
-    case "svg":
-    case "psd":
-      return <ImageIcon className="w-8 h-8 text-emerald-400 transition-colors duration-200" />
-    case "mp4":
-    case "avi":
-    case "mov":
-    case "wmv":
-      return <Video className="w-8 h-8 text-purple-400 transition-colors duration-200" />
-    case "mp3":
-    case "wav":
-    case "flac":
-      return <Music className="w-8 h-8 text-orange-400 transition-colors duration-200" />
-    case "zip":
-    case "rar":
-    case "7z":
-      return <Archive className="w-8 h-8 text-yellow-400 transition-colors duration-200" />
-    case "xlsx":
-    case "xls":
-    case "pptx":
-    case "ppt":
-      return <FileText className="w-8 h-8 text-red-400 transition-colors duration-200" />
-    default:
-      return <File className="w-8 h-8 text-gray-400 transition-colors duration-200" />
-  }
+interface Crumb {
+  id: number | null
+  name: string
 }
 
 export default function DriveView() {
-  const [currentPath, setCurrentPath] = useState("/")
+
+  const { signOut } = useAuth()
+
+  const { folderId = "root" } = useParams<{ folderId: string }>()
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  const parentId = folderId === "root" ? null : Number(folderId)
+
+  const folders = useFolders(parentId)
+  const files = useFiles(parentId ?? 0)
+  useUpload()
+
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [searchQuery, setSearchQuery] = useState("")
+  const [breadcrumbs, setBreadcrumbs] = useState<Crumb[]>([
+    { id: null, name: "My Drive" },
+  ])
 
-  const currentFolder = mockData[currentPath as keyof typeof mockData]
+  useEffect(() => {
+    const crumbs = (location.state as any)?.breadcrumbs as Crumb[] | undefined
+    setBreadcrumbs(crumbs ?? [{ id: null, name: "My Drive" }])
+  }, [folderId, location.state])
 
-  const filteredItems =
-    currentFolder?.items.filter((item) => item.name.toLowerCase().includes(searchQuery.toLowerCase())) || []
+  const filteredFolders = folders.filter((f) =>
+    f.name.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+  const filteredFiles = files.filter((f) =>
+    f.name.toLowerCase().includes(searchQuery.toLowerCase())
+  )
 
-  const breadcrumbs = currentPath === "/" ? ["My Drive"] : ["My Drive", ...currentPath.split("/").filter(Boolean)]
-
-  const navigateToFolder = (path: string) => {
-    setCurrentPath(path)
+  const openFolder = (id: number, name: string) => {
+    const newCrumbs = [...breadcrumbs, { id, name }]
+    navigate(`/drive/${id}`, { state: { breadcrumbs: newCrumbs } })
   }
 
   const navigateToBreadcrumb = (index: number) => {
-    if (index === 0) {
-      setCurrentPath("/")
-    } else {
-      const pathParts = currentPath.split("/").filter(Boolean)
-      const newPath = "/" + pathParts.slice(0, index).join("/")
-      setCurrentPath(newPath)
-    }
+    const crumb = breadcrumbs[index]
+    const newCrumbs = breadcrumbs.slice(0, index + 1)
+    navigate(crumb.id === null ? "/drive/root" : `/drive/${crumb.id}`, {
+      state: { breadcrumbs: newCrumbs },
+    })
   }
 
-  const handleUpload = () => {
-    alert("Upload functionality would be implemented here!")
-  }
+  const items = [
+    ...filteredFolders.map((f) => ({ ...f, type: "folder" as const })),
+    ...filteredFiles.map((f) => ({ ...f, type: "file" as const })),
+  ]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      {/* Header */}
       <div className="bg-slate-800/80 backdrop-blur-sm border-b border-slate-700/50 px-6 py-4 shadow-lg">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold text-white tracking-tight">Drive</h1>
+            <div className="flex items-center space-x-2">
+              <Cloud className="w-5 h-5 text-white" />
+              <span className="text-lg font-bold text-white">KDrive</span>
+            </div>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
               <Input
                 placeholder="Search in Drive"
                 value={searchQuery}
@@ -206,23 +117,25 @@ export default function DriveView() {
               variant="outline"
               size="icon"
               onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
-              className="bg-slate-700/50 border-slate-600 text-slate-300 hover:bg-slate-600 hover:text-white transition-all duration-200"
+              className="w-16 h-10 p-0 bg-slate-700/50 border-slate-600 text-slate-300 hover:bg-slate-600 hover:text-white transition-all duration-200 flex items-center justify-center"
             >
-              {viewMode === "grid" ? <List className="w-4 h-4" /> : <Grid3X3 className="w-4 h-4" />}
+              {viewMode === "grid" ? (
+                <List className="w-8 h-8" />
+              ) : (
+                <Grid3X3 className="w-8 h-8" />
+              )}
             </Button>
-            <Button
-              variant="outline"
-              onClick={handleUpload}
-              className="bg-slate-700/50 border-slate-600 text-slate-300 hover:bg-slate-600 hover:text-white transition-all duration-200"
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              <span>Upload</span>
+            <UploadButton parentId={parentId ?? 0} />
+            <Button 
+              variant="default" 
+              onClick={signOut} 
+              className="w-28 h-9.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium transition-all duration-200">
+              Sign Out
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Breadcrumbs */}
       <div className="bg-slate-800/60 backdrop-blur-sm border-b border-slate-700/30 px-6 py-3">
         <div className="flex items-center space-x-2 text-sm">
           {breadcrumbs.map((crumb, index) => (
@@ -230,21 +143,22 @@ export default function DriveView() {
               {index === 0 && <Home className="w-4 h-4 text-slate-400" />}
               <button
                 onClick={() => navigateToBreadcrumb(index)}
-                className="text-slate-300 hover:text-blue-400 hover:underline transition-colors duration-200 font-medium"
+                className="text-slate-300 hover:text-blue-400 transition-colors duration-200 font-medium"
               >
-                {crumb}
+                {crumb.name}
               </button>
-              {index < breadcrumbs.length - 1 && <ChevronRight className="w-4 h-4 text-slate-500" />}
+              {index < breadcrumbs.length - 1 && (
+                <ChevronRight className="w-4 h-4 text-slate-500" />
+              )}
             </div>
           ))}
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="p-6">
-        {filteredItems.length === 0 ? (
+        {items.length === 0 ? (
           <div className="text-center py-12 animate-in fade-in duration-500">
-            <Folder className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+            <FolderIcon className="w-16 h-16 text-slate-600 mx-auto mb-4" />
             <p className="text-slate-400 text-lg">
               {searchQuery ? "No items match your search" : "This folder is empty"}
             </p>
@@ -257,7 +171,7 @@ export default function DriveView() {
                 : "space-y-1"
             }
           >
-            {filteredItems.map((item, index) => (
+            {items.map((item, index) => (
               <div
                 key={item.id}
                 className="animate-in fade-in slide-in-from-bottom-2 duration-300"
@@ -267,27 +181,18 @@ export default function DriveView() {
                   <Card className="bg-slate-800/60 border-slate-700/50 hover:bg-slate-700/60 hover:border-slate-600 hover:shadow-xl hover:shadow-slate-900/20 transition-all duration-300 transform hover:scale-105 cursor-pointer backdrop-blur-sm">
                     <CardContent className="p-4 text-center">
                       {item.type === "folder" ? (
-                        <div onClick={() => navigateToFolder(item.path!)} className="group">
-                          <Folder className="w-12 h-12 text-blue-400 mx-auto mb-2 group-hover:text-blue-300 transition-colors duration-200" />
-                          <p className="text-sm font-medium text-slate-200 truncate group-hover:text-white transition-colors duration-200">
-                            {item.name}
-                          </p>
-                        </div>
+                        <FolderCard
+                          name={item.name}
+                          view="grid"
+                          onClick={() => openFolder(item.id, item.name)}
+                        />
                       ) : (
-                        <a
-                          href="#"
-                          className="block group hover:bg-slate-700/30 rounded-lg p-2 -m-2 transition-colors duration-200"
-                        >
-                          <div className="mb-2 flex justify-center group-hover:scale-110 transition-transform duration-200">
-                            {getFileIcon(item.name)}
-                          </div>
-                          <p className="text-sm font-medium text-slate-200 truncate group-hover:text-white transition-colors duration-200">
-                            {item.name}
-                          </p>
-                          <p className="text-xs text-slate-400 group-hover:text-slate-300 transition-colors duration-200">
-                            {item.size}
-                          </p>
-                        </a>
+                        <FileCard
+                          name={item.name}
+                          view="grid"
+                          size={formatBytes(item.size)}
+                          modified={new Date(item.createdAt).toLocaleDateString()}
+                        />
                       )}
                     </CardContent>
                   </Card>
@@ -295,56 +200,58 @@ export default function DriveView() {
                   <div className="flex items-center justify-between p-3 hover:bg-slate-800/40 rounded-lg transition-all duration-200 backdrop-blur-sm border border-transparent hover:border-slate-700/30">
                     <div className="flex items-center space-x-3 flex-1">
                       {item.type === "folder" ? (
-                        <button
-                          onClick={() => navigateToFolder(item.path!)}
-                          className="flex items-center space-x-3 flex-1 group"
-                        >
-                          <Folder className="w-6 h-6 text-blue-400 group-hover:text-blue-300 transition-colors duration-200" />
-                          <span className="font-medium text-slate-200 group-hover:text-white transition-colors duration-200">
-                            {item.name}
-                          </span>
-                        </button>
+                        <FolderCard
+                          name={item.name}
+                          view="list"
+                          onClick={() => openFolder(item.id, item.name)}
+                        />
                       ) : (
-                        <a href="#" className="flex items-center space-x-3 flex-1 group">
-                          <div className="group-hover:scale-110 transition-transform duration-200">
-                            {getFileIcon(item.name)}
-                          </div>
-                          <span className="font-medium text-slate-200 group-hover:text-white transition-colors duration-200">
-                            {item.name}
-                          </span>
-                        </a>
+                        <FileCard
+                          name={item.name}
+                          view="list"
+                          size={formatBytes(item.size)}
+                          modified={new Date(item.createdAt).toLocaleDateString()}
+                        />
                       )}
                     </div>
-                    <div className="flex items-center space-x-4 text-sm text-slate-400">
-                      {item.type === "file" && (
-                        <>
-                          <span className="hover:text-slate-300 transition-colors duration-200">{item.modified}</span>
-                          <span className="hover:text-slate-300 transition-colors duration-200">{item.size}</span>
-                        </>
-                      )}
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="w-8 h-8 text-slate-400 hover:text-white hover:bg-slate-700 transition-all duration-200"
-                          >
-                            <MoreVertical className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-slate-800 border-slate-700 text-slate-200">
-                          <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700">Open</DropdownMenuItem>
-                          <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700">Share</DropdownMenuItem>
-                          <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700">
-                            Download
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700">Rename</DropdownMenuItem>
-                          <DropdownMenuItem className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20">
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
+                    {item.type === "file" && (
+                      <div className="flex items-center space-x-4 text-sm text-slate-400">
+                        <span className="hover:text-slate-300 transition-colors duration-200">
+                          {new Date(item.createdAt).toLocaleDateString()}
+                        </span>
+                        <span className="hover:text-slate-300 transition-colors duration-200">
+                          {formatBytes(item.size)}
+                        </span>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="w-8 h-8 text-slate-400 hover:text-white hover:bg-slate-700 transition-all duration-200"
+                            >
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="bg-slate-800 border-slate-700 text-slate-200">
+                            <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700">
+                              Open
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700">
+                              Share
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700">
+                              Download
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700">
+                              Rename
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20">
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

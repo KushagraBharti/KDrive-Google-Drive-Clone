@@ -6,39 +6,69 @@ export interface FileCardProps {
   size?: string
   modified?: string
   onClick?: () => void
+  view?: 'grid' | 'list'
 }
 
-function getIcon(fileName: string) {
+function getIcon(fileName: string, big = false) {
   const ext = fileName.split('.').pop()?.toLowerCase()
+  const size = big ? 'w-12 h-12' : 'w-6 h-6'
   switch (ext) {
     case 'pdf':
     case 'doc':
     case 'docx':
     case 'txt':
-      return <FileText className="w-6 h-6 text-blue-400" />
+      return <FileText className={`${size} text-blue-400`} />
     case 'jpg':
     case 'jpeg':
     case 'png':
     case 'gif':
     case 'svg':
-      return <ImageIcon className="w-6 h-6 text-emerald-400" />
+      return <ImageIcon className={`${size} text-emerald-400`} />
     case 'mp4':
     case 'avi':
     case 'mov':
-      return <Video className="w-6 h-6 text-purple-400" />
+      return <Video className={`${size} text-purple-400`} />
     case 'mp3':
     case 'wav':
-      return <Music className="w-6 h-6 text-orange-400" />
+      return <Music className={`${size} text-orange-400`} />
     case 'zip':
     case 'rar':
     case '7z':
-      return <Archive className="w-6 h-6 text-yellow-400" />
+      return <Archive className={`${size} text-yellow-400`} />
     default:
-      return <File className="w-6 h-6 text-slate-400" />
+      return <File className={`${size} text-slate-400`} />
   }
 }
 
-export default function FileCard({ name, size, modified, onClick }: FileCardProps) {
+export default function FileCard({
+  name,
+  size,
+  modified,
+  onClick,
+  view = 'list',
+}: FileCardProps) {
+  if (view === 'grid') {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className="flex flex-col items-center justify-center space-y-2 w-full"
+      >
+        {getIcon(name, true)}
+        <span className="text-sm font-medium text-slate-200 truncate w-full text-center">
+          {name}
+        </span>
+        {(size || modified) && (
+          <span className="text-xs text-slate-400 truncate w-full text-center">
+            {modified}
+            {modified && size && ' • '}
+            {size}
+          </span>
+        )}
+      </button>
+    )
+  }
+
   return (
     <button
       type="button"
