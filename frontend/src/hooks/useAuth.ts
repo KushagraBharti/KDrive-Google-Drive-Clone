@@ -13,14 +13,6 @@ export function useAuth() {
     return await supabaseClient.auth.signUp({ email, password })
   }
 
-  async function signInWithGoogle() {
-    return await supabaseClient.auth.signInWithOAuth({ provider: 'google' })
-  }
-
-  async function sendMagicLink(email: string) {
-    return await supabaseClient.auth.signInWithOtp({ email })
-  }
-
   async function signOut() {
     return await supabaseClient.auth.signOut()
   }
@@ -29,8 +21,6 @@ export function useAuth() {
     ...state,
     signInWithEmail,
     signUpWithEmail,
-    signInWithGoogle,
-    sendMagicLink,
     signOut,
   }
 }
