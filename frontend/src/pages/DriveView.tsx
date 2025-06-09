@@ -211,13 +211,6 @@ export default function DriveView() {
               {viewMode === "grid" ? <List className="w-4 h-4" /> : <Grid3X3 className="w-4 h-4" />}
             </Button>
             <Button
-              onClick={handleUpload}
-              className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              <span>New</span>
-            </Button>
-            <Button
               variant="outline"
               onClick={handleUpload}
               className="bg-slate-700/50 border-slate-600 text-slate-300 hover:bg-slate-600 hover:text-white transition-all duration-200"

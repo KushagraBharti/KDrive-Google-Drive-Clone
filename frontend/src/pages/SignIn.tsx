@@ -1,5 +1,6 @@
 "use client"
 
+
 import type React from "react"
 
 import { useEffect, useState } from "react"
@@ -260,4 +261,6 @@ export default function SignInPage() {
       </div>
     </div>
   )
-}
+
+  export default function SignIn() {}
+
