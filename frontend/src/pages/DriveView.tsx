@@ -2,13 +2,11 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useNavigate, useLocation } from "react-router-dom"
-import Navbar from "@/components/Navbar"
 import FolderCard from "@/components/FolderCard"
 import FileCard from "@/components/FileCard"
 import UploadButton from "@/components/UploadButton"
 import { useFolders } from "@/hooks/useFolders"
 import { useFiles } from "@/hooks/useFiles"
-import { useUpload } from "@/hooks/useUpload"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -51,11 +49,10 @@ export default function DriveView() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const parentId = folderId === "root" ? null : Number(folderId)
+  const currentFolderId = folderId === "root" ? 0 : Number(folderId)
 
-  const folders = useFolders(parentId)
-  const files = useFiles(parentId ?? 0)
-  useUpload()
+  const folders = useFolders(currentFolderId === 0 ? null : currentFolderId)
+  const { files, refetch } = useFiles(currentFolderId)
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [searchQuery, setSearchQuery] = useState("")
@@ -125,7 +122,7 @@ export default function DriveView() {
                 <Grid3X3 className="w-8 h-8" />
               )}
             </Button>
-            <UploadButton parentId={parentId ?? 0} />
+            <UploadButton parentId={currentFolderId} onUploaded={refetch} />
             <Button 
               variant="default" 
               onClick={signOut} 
