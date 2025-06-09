@@ -19,9 +19,8 @@ Users can browse nested folders, upload files, and persist everything in your ow
 
 1. **Install dependencies**
    ```bash
-   yarn
-   # or
-   npm install
+   cd frontend
+   yarn install
    ```
 
 2. **Run the development server**
