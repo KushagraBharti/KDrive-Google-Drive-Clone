@@ -1,13 +1,13 @@
 import prisma from '@/services/prisma';
 
-export async function getFolders(parentId: number | null) {
+export function getFolders(parentId: number | null, ownerId: string) {
   return prisma.folder.findMany({
-    where: { parentId },
-    orderBy: { id: 'asc' }
+    where: { parentId, ownerId },
+    orderBy: { id: 'asc' },
   });
 }
 
-export async function createFolder(args: {
+export function createFolder(args: {
   name: string;
   parentId: number | null;
   ownerId: string;

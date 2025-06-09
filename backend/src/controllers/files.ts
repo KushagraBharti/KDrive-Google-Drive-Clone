@@ -1,13 +1,13 @@
 import prisma from '@/services/prisma';
 
-export async function getFiles(parentId: number) {
+export function getFiles(parentId: number, ownerId: string) {
   return prisma.file.findMany({
-    where: { parentId },
-    orderBy: { id: 'asc' }
+    where: { parentId, ownerId },
+    orderBy: { id: 'asc' },
   });
 }
 
-export async function createFile(args: {
+export function createFile(args: {
   name: string;
   size: number;
   url: string;
@@ -17,6 +17,8 @@ export async function createFile(args: {
   return prisma.file.create({ data: args });
 }
 
-export async function deleteFile(id: number) {
-  return prisma.file.delete({ where: { id } });
+export function deleteFile(id: number, ownerId: string) {
+  return prisma.file.delete({
+    where: { id, ownerId },
+  });
 }

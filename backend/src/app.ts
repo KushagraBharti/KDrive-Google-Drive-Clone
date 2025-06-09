@@ -1,9 +1,14 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 
+import authRoutes from './routes/auth';
+import folderRoutes from './routes/folders';
+import fileRoutes from './routes/files';
+
 export const app = Fastify();
 
-app.register(cors, { origin: true });  // allow cross-origin requests
-app.register(import('./routes/auth'));
-app.register(import('./routes/folders'));
-app.register(import('./routes/files'));
+app.register(cors, { origin: true });
+
+app.register(authRoutes);
+app.register(folderRoutes);
+app.register(fileRoutes);
