@@ -13,7 +13,7 @@ Users can browse nested folders, upload files, and persist everything in your ow
 - **Analytics**: PostHog via React SDK + `/ingest` proxy  
 - **Deploy & CI**: Vercel (auto-deploy) + GitHub Actions (typecheck + lint)
 
-----
+---
 
 ## Getting Started
 
