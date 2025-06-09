@@ -1,12 +1,14 @@
 "use client"
 
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Cloud, Shield, Zap, Users, ArrowRight, Star, Folder, Upload, Share } from "lucide-react"
 
 export default function LandingPage() {
   const [isHovered, setIsHovered] = useState(false)
+  const navigate = useNavigate()
 
   const features = [
     {
@@ -68,6 +70,7 @@ export default function LandingPage() {
             <Button
               variant="outline"
               className="bg-slate-700/50 border-slate-600 text-slate-300 hover:bg-slate-600 hover:text-white transition-all duration-200"
+              onClick={() => navigate('/signin')}
             >
               Sign In
             </Button>
@@ -97,6 +100,7 @@ export default function LandingPage() {
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg font-semibold shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105"
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
+              onClick={() => navigate('/signin')}
             >
               Get Started Free
               <ArrowRight
@@ -201,6 +205,7 @@ export default function LandingPage() {
             <Button
               size="lg"
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg font-semibold shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105"
+              onClick={() => navigate('/signin')}
             >
               Start Free Trial
             </Button>

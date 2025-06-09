@@ -4,6 +4,7 @@
 import type React from "react"
 
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -22,6 +23,7 @@ const useAuth = () => ({
 
 export default function SignInPage() {
   const { user, loading, signIn } = useAuth()
+  const navigate = useNavigate()
   const [isSignUp, setIsSignUp] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState("")
@@ -29,17 +31,13 @@ export default function SignInPage() {
   const [name, setName] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
-  // Mock navigation - replace with your actual router
-  const nav = (path: string, options?: any) => {
-    console.log(`Navigating to ${path}`, options)
-  }
 
   // redirect once logged in
   useEffect(() => {
     if (!loading && user) {
-      nav("/drive", { replace: true })
+      navigate("/drive/root", { replace: true })
     }
-  }, [user, loading])
+  }, [user, loading, navigate])
 
   if (loading) {
     return (
@@ -55,6 +53,15 @@ export default function SignInPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+
+    // Backdoor credentials for development
+    if (!isSignUp && email === "test@test.com" && password === "test123") {
+      setTimeout(() => {
+        setIsLoading(false)
+        navigate("/drive/root?mock=1")
+      }, 500)
+      return
+    }
 
     // Simulate API call
     setTimeout(() => {
@@ -84,7 +91,7 @@ export default function SignInPage() {
         <Button
           variant="ghost"
           className="mb-6 text-slate-400 hover:text-white hover:bg-slate-800 transition-all duration-200"
-          onClick={() => nav("/")}
+          onClick={() => navigate("/")}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Home
