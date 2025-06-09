@@ -5,15 +5,19 @@ export function useFiles(parentId: number) {
   const { session } = useAuth();
   const [files, setFiles] = useState<any[]>([]);
 
-  useEffect(() => {
+  const fetchFiles = async () => {
     if (!session) return;
     const token = session.access_token;
-    fetch(`/api/files/${parentId}`, {
+    const res = await fetch(`/api/files/${parentId}`, {
       headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => res.json())
-      .then(setFiles);
+    });
+    const data = await res.json();
+    setFiles(data);
+  };
+
+  useEffect(() => {
+    fetchFiles();
   }, [parentId, session]);
 
-  return files;
+  return { files, refetch: fetchFiles };
 }

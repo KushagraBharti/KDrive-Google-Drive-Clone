@@ -5,9 +5,10 @@ import { useUpload } from '@/hooks/useUpload'
 
 export interface UploadButtonProps {
   parentId: number
+  onUploaded?: () => void
 }
 
-export default function UploadButton({ parentId }: UploadButtonProps) {
+export default function UploadButton({ parentId, onUploaded }: UploadButtonProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const { uploadFile } = useUpload()
 
@@ -16,6 +17,7 @@ export default function UploadButton({ parentId }: UploadButtonProps) {
     if (file) {
       await uploadFile(file, parentId)
       e.target.value = ''
+      onUploaded?.()
     }
   }
 
