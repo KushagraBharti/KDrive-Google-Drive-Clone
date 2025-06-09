@@ -11,18 +11,16 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Cloud, Mail, ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react"
-
-// Mock auth hook - replace with your actual implementation
-const useAuth = () => ({
-  user: null,
-  loading: false,
-  signIn: (provider: string | null) => {
-    console.log(`Signing in with ${provider || "magic link"}`)
-  },
-})
+import { useAuth } from "@/hooks/useAuth"
 
 export default function SignInPage() {
-  const { user, loading, signIn } = useAuth()
+  const {
+    user,
+    signInWithEmail,
+    signUpWithEmail,
+    signInWithGoogle,
+    sendMagicLink,
+  } = useAuth()
   const navigate = useNavigate()
   const [isSignUp, setIsSignUp] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -34,40 +32,26 @@ export default function SignInPage() {
 
   // redirect once logged in
   useEffect(() => {
-    if (!loading && user) {
+    if (user) {
       navigate("/drive/root", { replace: true })
     }
-  }, [user, loading, navigate])
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="flex items-center space-x-2 text-white">
-          <Loader2 className="w-6 h-6 animate-spin" />
-          <span className="text-lg">Loading...</span>
-        </div>
-      </div>
-    )
-  }
+  }, [user, navigate])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
-    // Backdoor credentials for development
-    if (!isSignUp && email === "test@test.com" && password === "test123") {
-      setTimeout(() => {
-        setIsLoading(false)
-        navigate("/drive/root?mock=1")
-      }, 500)
-      return
-    }
+    const { error } = isSignUp
+      ? await signUpWithEmail(email, password)
+      : await signInWithEmail(email, password)
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false)
-      console.log(isSignUp ? "Sign up" : "Sign in", { email, password, name })
-    }, 2000)
+    setIsLoading(false)
+
+    if (!error) {
+      navigate('/drive/root', { replace: true })
+    } else {
+      alert(error.message)
+    }
   }
 
   const handleMagicLink = () => {
@@ -75,7 +59,7 @@ export default function SignInPage() {
       alert("Please enter your email address first")
       return
     }
-    signIn(null)
+    sendMagicLink(email)
   }
 
   return (
@@ -115,7 +99,7 @@ export default function SignInPage() {
           <CardContent className="space-y-6">
             {/* Social Sign In */}
             <Button
-              onClick={() => signIn("google")}
+              onClick={() => signInWithGoogle()}
               className="w-full bg-white hover:bg-gray-100 text-gray-900 font-medium py-3 transition-all duration-200 transform hover:scale-105"
             >
               <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
