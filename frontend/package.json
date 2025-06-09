@@ -76,5 +76,6 @@
     "tsx": "^4.19.4",
     "typescript": "^5",
     "vite": "^5.0.0"
-  }
+  },
+  "type": "module"
 }
