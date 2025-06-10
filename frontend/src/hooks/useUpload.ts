@@ -14,7 +14,7 @@ export function useUpload() {
 
     const url = supabaseClient.storage.from('files').getPublicUrl(data.path).data.publicUrl;
 
-    await fetch('/api/files', {
+    const res = await fetch('/api/files', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -26,7 +26,11 @@ export function useUpload() {
         url,
         parentId
       })
-    });
+    })
+
+    if (!res.ok) {
+      throw new Error('Failed to save file metadata')
+    }
   }
 
   return { uploadFile };

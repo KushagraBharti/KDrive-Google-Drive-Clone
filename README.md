@@ -40,3 +40,5 @@ Users can browse nested folders, upload files, and persist everything in your ow
       cp frontend/.env.example frontend/.env
       ```
       Then edit `frontend/.env` and set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+   3. In Supabase Storage, create a `files` bucket with **Private** access.
+      Allow CORS requests from `http://localhost:5173` so local uploads work.
