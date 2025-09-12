@@ -1,19 +1,21 @@
-import { Folder } from 'lucide-react'
+import { Folder as FolderIcon } from 'lucide-react'
+import type { Folder } from '@prisma/client'
 import type React from 'react'
 
 export interface FolderCardProps {
-  name: string
+  folder: Folder
   modified?: string
   onClick?: () => void
   view?: 'grid' | 'list'
 }
 
 export default function FolderCard({
-  name,
+  folder,
   modified,
   onClick,
   view = 'list',
 }: FolderCardProps) {
+  const { name } = folder
   if (view === 'grid') {
     return (
       <button
@@ -21,7 +23,7 @@ export default function FolderCard({
         onClick={onClick}
         className="flex flex-col items-center justify-center space-y-2 w-full"
       >
-        <Folder className="w-12 h-12 text-blue-400" />
+        <FolderIcon className="w-12 h-12 text-blue-400" />
         <span className="text-sm font-medium text-slate-200 truncate w-full text-center">
           {name}
         </span>
@@ -40,7 +42,7 @@ export default function FolderCard({
       onClick={onClick}
       className="flex items-center space-x-3 text-left hover:bg-slate-800/40 p-2 rounded-md w-full"
     >
-      <Folder className="w-6 h-6 text-blue-400" />
+      <FolderIcon className="w-6 h-6 text-blue-400" />
       <div className="flex flex-col flex-1">
         <span className="font-medium text-slate-200">{name}</span>
         {modified && <span className="text-sm text-slate-400">{modified}</span>}

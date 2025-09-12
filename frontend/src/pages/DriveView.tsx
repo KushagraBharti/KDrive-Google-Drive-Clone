@@ -26,6 +26,7 @@ import {
   Cloud,
   FolderPlus,
 } from "lucide-react"
+import type { Folder, File as PrismaFile } from '@prisma/client'
 import { useAuth } from '@/hooks/useAuth'
 import { supabaseClient } from '@/contexts/SupabaseContext'
 
@@ -110,7 +111,7 @@ export default function DriveView() {
     refetch()
   }
 
-  const handleDownload = async (file: any) => {
+  const handleDownload = async (file: PrismaFile) => {
     const { data } = await supabaseClient.storage.from('files').download(file.path)
     if (data) {
       const url = URL.createObjectURL(data)
@@ -122,7 +123,7 @@ export default function DriveView() {
     }
   }
 
-  const handleRename = async (file: any) => {
+  const handleRename = async (file: PrismaFile) => {
     if (!token) return
     const newName = window.prompt('Enter new name', file.name)
     if (!newName || newName === file.name) return
@@ -137,9 +138,13 @@ export default function DriveView() {
     refetch()
   }
 
-  const items = [
-    ...filteredFolders.map((f) => ({ ...f, type: "folder" as const })),
-    ...filteredFiles.map((f) => ({ ...f, type: "file" as const })),
+  type FolderItem = Folder & { type: 'folder' }
+  type FileItem = PrismaFile & { type: 'file' }
+  type Item = FolderItem | FileItem
+
+  const items: Item[] = [
+    ...filteredFolders.map((f): FolderItem => ({ ...f, type: 'folder' })),
+    ...filteredFiles.map((f): FileItem => ({ ...f, type: 'file' })),
   ]
 
   return (
@@ -218,13 +223,13 @@ export default function DriveView() {
                     <CardContent className="p-4 text-center relative">
                       {item.type === "folder" ? (
                         <FolderCard
-                          name={item.name}
+                          folder={item}
                           view="grid"
                           onClick={() => openFolder(item.id, item.name)}
                         />
                       ) : (
                         <FileCard
-                          name={item.name}
+                          file={item}
                           view="grid"
                           size={formatBytes(item.size)}
                           modified={new Date(item.createdAt).toLocaleDateString()}
@@ -269,13 +274,13 @@ export default function DriveView() {
                     <div className="flex items-center space-x-3 flex-1">
                       {item.type === "folder" ? (
                         <FolderCard
-                          name={item.name}
+                          folder={item}
                           view="list"
                           onClick={() => openFolder(item.id, item.name)}
                         />
                       ) : (
                         <FileCard
-                          name={item.name}
+                          file={item}
                           view="list"
                           size={formatBytes(item.size)}
                           modified={new Date(item.createdAt).toLocaleDateString()}
