@@ -5,6 +5,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom"
 import FolderCard from "@/components/FolderCard"
 import FileCard from "@/components/FileCard"
 import UploadButton from "@/components/UploadButton"
+import Breadcrumb, { Crumb } from "@/components/Breadcrumb"
 import { useFolders } from "@/hooks/useFolders"
 import { useFiles } from "@/hooks/useFiles"
 import { Button } from "@/components/ui/button"
@@ -22,8 +23,6 @@ import {
   Grid3X3,
   List,
   MoreVertical,
-  Home,
-  ChevronRight,
   Cloud,
 } from "lucide-react"
 import { useAuth } from '@/hooks/useAuth'
@@ -34,11 +33,6 @@ function formatBytes(bytes: number) {
   const sizes = ["B", "KB", "MB", "GB", "TB"]
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`
-}
-
-interface Crumb {
-  id: number | null
-  name: string
 }
 
 export default function DriveView() {
@@ -133,24 +127,7 @@ export default function DriveView() {
         </div>
       </div>
 
-      <div className="bg-slate-800/60 backdrop-blur-sm border-b border-slate-700/30 px-6 py-3">
-        <div className="flex items-center space-x-2 text-sm">
-          {breadcrumbs.map((crumb, index) => (
-            <div key={index} className="flex items-center space-x-2 animate-in fade-in duration-200">
-              {index === 0 && <Home className="w-4 h-4 text-slate-400" />}
-              <button
-                onClick={() => navigateToBreadcrumb(index)}
-                className="text-slate-300 hover:text-blue-400 transition-colors duration-200 font-medium"
-              >
-                {crumb.name}
-              </button>
-              {index < breadcrumbs.length - 1 && (
-                <ChevronRight className="w-4 h-4 text-slate-500" />
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
+      <Breadcrumb crumbs={breadcrumbs} onNavigate={navigateToBreadcrumb} />
 
       <div className="p-6">
         {items.length === 0 ? (
