@@ -5,7 +5,6 @@ import {
   validatorCompiler,
   serializerCompiler,
 } from 'fastify-type-provider-zod';
-import pino from 'pino';
 import rateLimit from '@fastify/rate-limit';
 
 import authRoutes from './routes/auth';
