@@ -1,8 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { createFile, deleteFile, getFiles, renameFile } from '@/controllers/files';
 
-console.log("Loading files.ts");
-
 export default async function (app: FastifyInstance) {
   app.get('/api/files/:parentId', async (request, reply) => {
     const user = request.user;

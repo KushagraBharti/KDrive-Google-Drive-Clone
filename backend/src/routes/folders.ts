@@ -1,8 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { createFolder, getFolders, deleteFolder, renameFolder } from '@/controllers/folders';
 
-console.log("Loading folders.ts");
-
 export default async function (app: FastifyInstance) {
   app.get('/api/folders/:parentId?', async (request, reply) => {
     const user = request.user;
