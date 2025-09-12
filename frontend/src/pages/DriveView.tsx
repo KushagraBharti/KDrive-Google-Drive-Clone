@@ -24,6 +24,7 @@ import {
   List,
   MoreVertical,
   Cloud,
+  FolderPlus,
 } from "lucide-react"
 import { useAuth } from '@/hooks/useAuth'
 
@@ -45,7 +46,7 @@ export default function DriveView() {
 
   const currentFolderId = folderId === "root" ? 0 : Number(folderId)
 
-  const folders = useFolders(currentFolderId === 0 ? null : currentFolderId)
+  const { folders, createFolder } = useFolders(currentFolderId === 0 ? null : currentFolderId)
   const { files, refetch } = useFiles(currentFolderId)
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
@@ -77,6 +78,13 @@ export default function DriveView() {
     navigate(crumb.id === null ? "/drive/root" : `/drive/${crumb.id}`, {
       state: { breadcrumbs: newCrumbs },
     })
+  }
+
+  const handleCreateFolder = async () => {
+    const name = prompt('Folder name')
+    if (name && name.trim()) {
+      await createFolder(name.trim())
+    }
   }
 
   const items = [
@@ -117,6 +125,10 @@ export default function DriveView() {
               )}
             </Button>
             <UploadButton parentId={currentFolderId} onUploaded={refetch} />
+            <Button onClick={handleCreateFolder}>
+              <FolderPlus className="w-4 h-4 mr-2" />
+              New Folder
+            </Button>
             <Button 
               variant="default" 
               onClick={signOut} 
