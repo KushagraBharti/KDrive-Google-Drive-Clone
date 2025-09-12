@@ -37,6 +37,7 @@ export default fp(async function verifySessionPlugin(app) {
       request.user = user;
     } catch {
       reply.code(401).send({ error: 'Unauthorized' });
+      return;
     }
   });
 });
