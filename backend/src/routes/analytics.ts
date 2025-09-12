@@ -1,8 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { forwardToPostHog } from '@/services/analytics';
 
-console.log("Loading analytics.ts");
-
 export default async function (app: FastifyInstance) {
   app.post('/ingest', async (request, reply) => {
     const res = await forwardToPostHog(request.body);
