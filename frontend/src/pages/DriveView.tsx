@@ -24,6 +24,7 @@ import {
   List,
   MoreVertical,
   Cloud,
+  FolderPlus,
 } from "lucide-react"
 import { useAuth } from '@/hooks/useAuth'
 
@@ -79,6 +80,13 @@ export default function DriveView() {
     })
   }
 
+  const handleCreateFolder = async () => {
+    const name = prompt('Folder name')
+    if (name && name.trim()) {
+      await createFolder(name.trim())
+    }
+  }
+
   const items = [
     ...filteredFolders.map((f) => ({ ...f, type: "folder" as const })),
     ...filteredFiles.map((f) => ({ ...f, type: "file" as const })),
@@ -117,6 +125,10 @@ export default function DriveView() {
               )}
             </Button>
             <UploadButton parentId={currentFolderId} onUploaded={refetch} />
+            <Button onClick={handleCreateFolder}>
+              <FolderPlus className="w-4 h-4 mr-2" />
+              New Folder
+            </Button>
             <Button 
               variant="default" 
               onClick={signOut} 

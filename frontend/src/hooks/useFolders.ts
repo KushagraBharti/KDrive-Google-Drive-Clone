@@ -19,11 +19,13 @@ export function useFolders(parentId: number | null) {
     fetchFolders();
   }, [parentId, session]);
 
+
   const renameFolder = async (id: number, name: string) => {
     if (!session) return;
     const token = session.access_token;
     const res = await fetch(`/api/folders/${id}`, {
       method: 'PATCH',
+
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
