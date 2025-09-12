@@ -8,6 +8,7 @@ import UploadButton from "@/components/UploadButton"
 import Breadcrumb, { Crumb } from "@/components/Breadcrumb"
 import RenameFolderDialog from "@/components/RenameFolderDialog"
 import ConfirmFolderDeleteDialog from "@/components/ConfirmFolderDeleteDialog"
+import NewFolderDialog from "@/components/NewFolderDialog"
 import { useFolders } from "@/hooks/useFolders"
 import { useFiles } from "@/hooks/useFiles"
 import { Button } from "@/components/ui/button"
@@ -71,6 +72,7 @@ export default function DriveView() {
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [searchQuery, setSearchQuery] = useState("")
+  const [newFolderOpen, setNewFolderOpen] = useState(false)
   const [breadcrumbs, setBreadcrumbs] = useState<Crumb[]>([
     { id: null, name: "My Drive" },
   ])
@@ -117,10 +119,8 @@ export default function DriveView() {
     )
   }
 
-  const handleCreateFolder = async () => {
-    if (!token) return
-    const name = window.prompt('Folder name')
-    if (!name) return
+  const handleCreateFolder = async (name: string) => {
+    if (!token || !name) return
     await fetch('/api/folders', {
       method: 'POST',
       headers: {
@@ -133,6 +133,7 @@ export default function DriveView() {
       }),
     })
     refetchFolders()
+    setNewFolderOpen(false)
   }
 
   const handleDelete = async (id: number) => {
@@ -182,6 +183,11 @@ export default function DriveView() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <NewFolderDialog
+        open={newFolderOpen}
+        onOpenChange={setNewFolderOpen}
+        onCreate={handleCreateFolder}
+      />
       <div className="bg-slate-800/80 backdrop-blur-sm border-b border-slate-700/50 px-6 py-4 shadow-lg">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
@@ -213,7 +219,7 @@ export default function DriveView() {
               )}
             </Button>
             <UploadButton parentId={currentFolderId} onUploaded={refetch} />
-            <Button onClick={handleCreateFolder}>
+            <Button onClick={() => setNewFolderOpen(true)}>
               <FolderPlus className="w-4 h-4 mr-2" />
               New Folder
             </Button>
