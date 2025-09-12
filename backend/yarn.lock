@@ -567,6 +567,11 @@ pino@^9.0.0:
     sonic-boom "^4.0.1"
     thread-stream "^3.0.0"
 
+postgres@^3.4.7:
+  version "3.4.7"
+  resolved "https://registry.yarnpkg.com/postgres/-/postgres-3.4.7.tgz#122f460a808fe300cae53f592108b9906e625345"
+  integrity sha512-Jtc2612XINuBjIl/QTWsV5UvE8UHuNblcO3vVADSrKsrc6RqGX6lOW1cEo3CM2v0XG4Nat8nI+YM7/f26VxXLw==
+
 prisma@^6.9.0:
   version "6.9.0"
   resolved "https://registry.yarnpkg.com/prisma/-/prisma-6.9.0.tgz#c8bce4fc63f0c6972f3868692e649bb163fd807d"
