@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
+import { type File as PrismaFile } from '@prisma/client';
 import { useAuth } from './useAuth';
 
 export function useFiles(parentId: number) {
   const { session } = useAuth();
-  const [files, setFiles] = useState<any[]>([]);
+  const [files, setFiles] = useState<PrismaFile[]>([]);
 
   const fetchFiles = async () => {
     if (!session) return;
@@ -11,7 +12,7 @@ export function useFiles(parentId: number) {
     const res = await fetch(`/api/files/${parentId}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    const data = await res.json();
+    const data: PrismaFile[] = await res.json();
     setFiles(data);
   };
 

@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
+import { type Folder } from '@prisma/client';
 import { useAuth } from './useAuth';
 
 export function useFolders(parentId: number | null) {
   const { session } = useAuth();
-  const [folders, setFolders] = useState<any[]>([]);
+  const [folders, setFolders] = useState<Folder[]>([]);
 
   const fetchFolders = async () => {
     if (!session) return;
@@ -11,7 +12,7 @@ export function useFolders(parentId: number | null) {
     const res = await fetch(`/api/folders/${parentId ?? ''}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    const data = await res.json();
+    const data: Folder[] = await res.json();
     setFolders(data);
   };
 
@@ -32,7 +33,7 @@ export function useFolders(parentId: number | null) {
       },
       body: JSON.stringify({ name })
     });
-    const data = await res.json();
+    const data: Folder = await res.json();
     setFolders((prev) => prev.map((f) => (f.id === id ? data : f)));
   };
 
