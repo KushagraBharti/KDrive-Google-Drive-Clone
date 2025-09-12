@@ -9,8 +9,21 @@ export function useAuth() {
     return await supabaseClient.auth.signInWithPassword({ email, password })
   }
 
-  async function signUpWithEmail(email: string, password: string) {
-    return await supabaseClient.auth.signUp({ email, password })
+  async function signUpWithEmail(
+    email: string,
+    password: string,
+    name: string
+  ) {
+    const result = await supabaseClient.auth.signUp({ email, password })
+    if (!result.error) {
+      const { error } = await supabaseClient.auth.updateUser({
+        data: { name },
+      })
+      if (error) {
+        return { ...result, error }
+      }
+    }
+    return result
   }
 
   async function signOut() {
