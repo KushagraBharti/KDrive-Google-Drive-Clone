@@ -1,7 +1,8 @@
 import posthog from 'posthog-js';
+import { env } from '@/env';
 
 export function initPosthog() {
-  const key = import.meta.env.VITE_POSTHOG_KEY;
+  const key = env.VITE_POSTHOG_KEY;
   if (!key) return;
 
   posthog.init(key, {
