@@ -1,13 +1,10 @@
 import { FastifyInstance } from 'fastify';
-import { verifySession } from '@/controllers/auth';
 import { supabaseAdmin } from '@/services/supabase';
 
 export default async function (app: FastifyInstance) {
   // Create a signed upload URL for the authenticated user
   app.post('/api/storage/signed-upload', async (request, reply) => {
-    const token = (request.headers.authorization || '').replace('Bearer ', '');
-    const user = await verifySession(token);
-
+    const user = request.user;
     const { fileName } = (request.body as any) || {};
     if (!fileName || typeof fileName !== 'string') {
       reply.code(400).send({ error: 'fileName is required' });

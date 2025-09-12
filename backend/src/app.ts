@@ -9,6 +9,7 @@ import folderRoutes from './routes/folders';
 import fileRoutes from './routes/files';
 import analyticsRoutes from './routes/analytics';
 import storageRoutes from './routes/storage';
+import verifySessionPlugin from './plugins/verifySession';
 
 export const app = Fastify({
   logger: pino({ level: 'info' }),
@@ -20,6 +21,9 @@ app.register(rateLimit, {
 });
 
 app.register(cors, { origin: true });
+
+// Globally verify sessions for all API routes
+app.register(verifySessionPlugin);
 
 app.addHook('onRequest', (request, reply, done) => {
   app.log.info({ method: request.method, url: request.url }, 'incoming request');

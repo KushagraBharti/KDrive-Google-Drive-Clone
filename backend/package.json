@@ -12,6 +12,7 @@
     "prisma:seed": "tsx src/models/seed.ts",
     "test-db": "tsx src/utils/test-db.ts",
     "lint": "eslint . --ext .ts,.tsx --resolve-plugins-relative-to .",
+    "test": "tsx --test test/**/*.test.ts"
     "test": "vitest run"
   },
   "dependencies": {
