@@ -2,8 +2,6 @@ import { FastifyInstance } from 'fastify';
 import { createFile, deleteFile, getFiles, renameFile } from '@/controllers/files';
 import { verifySession } from '@/controllers/auth';
 
-console.log("Loading files.ts");
-
 export default async function (app: FastifyInstance) {
   app.get('/api/files/:parentId', async (request, reply) => {
     const token = (request.headers.authorization || '').replace('Bearer ', '');
