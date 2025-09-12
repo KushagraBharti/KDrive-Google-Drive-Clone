@@ -6,6 +6,8 @@ import FolderCard from "@/components/FolderCard"
 import FileCard from "@/components/FileCard"
 import UploadButton from "@/components/UploadButton"
 import Breadcrumb, { Crumb } from "@/components/Breadcrumb"
+import RenameFolderDialog from "@/components/RenameFolderDialog"
+import ConfirmFolderDeleteDialog from "@/components/ConfirmFolderDeleteDialog"
 import { useFolders } from "@/hooks/useFolders"
 import { useFiles } from "@/hooks/useFiles"
 import { Button } from "@/components/ui/button"
@@ -97,6 +99,9 @@ export default function DriveView() {
       state: { breadcrumbs: newCrumbs },
     })
   }
+
+  const [folderToRename, setFolderToRename] = useState<Folder | null>(null)
+  const [folderToDelete, setFolderToDelete] = useState<Folder | null>(null)
 
   const token = session?.access_token
 
@@ -277,18 +282,13 @@ export default function DriveView() {
                           <DropdownMenuContent align="end" className="bg-slate-800 border-slate-700 text-slate-200">
                             <DropdownMenuItem
                               className="hover:bg-slate-700 focus:bg-slate-700"
-                              onClick={() => {
-                                const name = window.prompt('Rename folder', item.name);
-                                if (name) renameFolder(item.id, name);
-                              }}
+                              onClick={() => setFolderToRename(item)}
                             >
                               Rename
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20"
-                              onClick={() => {
-                                if (window.confirm('Delete folder?')) deleteFolder(item.id);
-                              }}
+                              onClick={() => setFolderToDelete(item)}
                             >
                               Delete
                             </DropdownMenuItem>
@@ -368,18 +368,13 @@ export default function DriveView() {
                           <DropdownMenuContent align="end" className="bg-slate-800 border-slate-700 text-slate-200">
                             <DropdownMenuItem
                               className="hover:bg-slate-700 focus:bg-slate-700"
-                              onClick={() => {
-                                const name = window.prompt('Rename folder', item.name);
-                                if (name) renameFolder(item.id, name);
-                              }}
+                              onClick={() => setFolderToRename(item)}
                             >
                               Rename
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20"
-                              onClick={() => {
-                                if (window.confirm('Delete folder?')) deleteFolder(item.id);
-                              }}
+                              onClick={() => setFolderToDelete(item)}
                             >
                               Delete
                             </DropdownMenuItem>
@@ -394,6 +389,28 @@ export default function DriveView() {
           </div>
         )}
       </div>
+      <RenameFolderDialog
+        open={!!folderToRename}
+        folderId={folderToRename?.id ?? 0}
+        currentName={folderToRename?.name ?? ''}
+        onOpenChange={(open) => {
+          if (!open) setFolderToRename(null)
+        }}
+        onRename={async (id, name) => {
+          await renameFolder(id, name)
+        }}
+      />
+      <ConfirmFolderDeleteDialog
+        open={!!folderToDelete}
+        folderId={folderToDelete?.id ?? 0}
+        folderName={folderToDelete?.name}
+        onOpenChange={(open) => {
+          if (!open) setFolderToDelete(null)
+        }}
+        onDelete={async (id) => {
+          await deleteFolder(id)
+        }}
+      />
     </div>
   )
 }
