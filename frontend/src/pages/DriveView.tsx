@@ -5,6 +5,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom"
 import FolderCard from "@/components/FolderCard"
 import FileCard from "@/components/FileCard"
 import UploadButton from "@/components/UploadButton"
+import Dropzone from "@/components/Dropzone"
 import Breadcrumb, { Crumb } from "@/components/Breadcrumb"
 import RenameFolderDialog from "@/components/RenameFolderDialog"
 import ConfirmFolderDeleteDialog from "@/components/ConfirmFolderDeleteDialog"
@@ -191,7 +192,8 @@ export default function DriveView() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <Dropzone parentId={currentFolderId} onUploaded={refetch}>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <NewFolderDialog
         open={newFolderOpen}
         onOpenChange={setNewFolderOpen}
@@ -436,6 +438,7 @@ export default function DriveView() {
           await deleteFolder(id)
         }}
       />
-    </div>
+      </div>
+    </Dropzone>
   )
 }
