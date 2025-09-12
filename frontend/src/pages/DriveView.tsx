@@ -6,11 +6,15 @@ import FolderCard from "@/components/FolderCard"
 import FileCard from "@/components/FileCard"
 import UploadButton from "@/components/UploadButton"
 import Breadcrumb, { Crumb } from "@/components/Breadcrumb"
+import RenameFolderDialog from "@/components/RenameFolderDialog"
+import ConfirmFolderDeleteDialog from "@/components/ConfirmFolderDeleteDialog"
+import NewFolderDialog from "@/components/NewFolderDialog"
 import { useFolders } from "@/hooks/useFolders"
 import { useFiles } from "@/hooks/useFiles"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import RenameFileDialog from "@/components/RenameFileDialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -70,11 +74,14 @@ export default function DriveView() {
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [searchQuery, setSearchQuery] = useState("")
+  const [newFolderOpen, setNewFolderOpen] = useState(false)
   const [breadcrumbs, setBreadcrumbs] = useState<Crumb[]>([
     { id: null, name: "My Drive" },
   ])
   const [shareOpen, setShareOpen] = useState(false)
   const [shareUrl, setShareUrl] = useState<string | null>(null)
+  const [fileToRename, setFileToRename] = useState<PrismaFile | null>(null)
+
 
   useEffect(() => {
     const crumbs = (location.state as any)?.breadcrumbs as Crumb[] | undefined
@@ -101,6 +108,9 @@ export default function DriveView() {
     })
   }
 
+  const [folderToRename, setFolderToRename] = useState<Folder | null>(null)
+  const [folderToDelete, setFolderToDelete] = useState<Folder | null>(null)
+
   const token = session?.access_token
 
   if (isLoading) {
@@ -115,10 +125,8 @@ export default function DriveView() {
     )
   }
 
-  const handleCreateFolder = async () => {
-    if (!token) return
-    const name = window.prompt('Folder name')
-    if (!name) return
+  const handleCreateFolder = async (name: string) => {
+    if (!token || !name) return
     await fetch('/api/folders', {
       method: 'POST',
       headers: {
@@ -131,6 +139,7 @@ export default function DriveView() {
       }),
     })
     refetchFolders()
+    setNewFolderOpen(false)
   }
 
   const handleDelete = async (id: number) => {
@@ -154,19 +163,8 @@ export default function DriveView() {
     }
   }
 
-  const handleRename = async (file: PrismaFile) => {
-    if (!token) return
-    const newName = window.prompt('Enter new name', file.name)
-    if (!newName || newName === file.name) return
-    await fetch(`/api/files/${file.id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ name: newName })
-    })
-    refetch()
+  const handleRenameClick = (file: PrismaFile) => {
+    setFileToRename(file)
   }
 
   const handleShare = async (file: PrismaFile) => {
@@ -194,6 +192,11 @@ export default function DriveView() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <NewFolderDialog
+        open={newFolderOpen}
+        onOpenChange={setNewFolderOpen}
+        onCreate={handleCreateFolder}
+      />
       <div className="bg-slate-800/80 backdrop-blur-sm border-b border-slate-700/50 px-6 py-4 shadow-lg">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
@@ -225,7 +228,7 @@ export default function DriveView() {
               )}
             </Button>
             <UploadButton parentId={currentFolderId} onUploaded={refetch} />
-            <Button onClick={handleCreateFolder}>
+            <Button onClick={() => setNewFolderOpen(true)}>
               <FolderPlus className="w-4 h-4 mr-2" />
               New Folder
             </Button>
@@ -294,18 +297,13 @@ export default function DriveView() {
                           <DropdownMenuContent align="end" className="bg-slate-800 border-slate-700 text-slate-200">
                             <DropdownMenuItem
                               className="hover:bg-slate-700 focus:bg-slate-700"
-                              onClick={() => {
-                                const name = window.prompt('Rename folder', item.name);
-                                if (name) renameFolder(item.id, name);
-                              }}
+                              onClick={() => setFolderToRename(item)}
                             >
                               Rename
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20"
-                              onClick={() => {
-                                if (window.confirm('Delete folder?')) deleteFolder(item.id);
-                              }}
+                              onClick={() => setFolderToDelete(item)}
                             >
                               Delete
                             </DropdownMenuItem>
@@ -363,7 +361,7 @@ export default function DriveView() {
                             <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700" onClick={() => handleDownload(item)}>
                               Download
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700" onClick={() => handleRename(item)}>
+                            <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700" onClick={() => handleRenameClick(item)}>
                               Rename
                             </DropdownMenuItem>
                             <DropdownMenuItem className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20" onClick={() => handleDelete(item.id)}>
@@ -388,18 +386,13 @@ export default function DriveView() {
                           <DropdownMenuContent align="end" className="bg-slate-800 border-slate-700 text-slate-200">
                             <DropdownMenuItem
                               className="hover:bg-slate-700 focus:bg-slate-700"
-                              onClick={() => {
-                                const name = window.prompt('Rename folder', item.name);
-                                if (name) renameFolder(item.id, name);
-                              }}
+                              onClick={() => setFolderToRename(item)}
                             >
                               Rename
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20"
-                              onClick={() => {
-                                if (window.confirm('Delete folder?')) deleteFolder(item.id);
-                              }}
+                              onClick={() => setFolderToDelete(item)}
                             >
                               Delete
                             </DropdownMenuItem>
@@ -415,6 +408,33 @@ export default function DriveView() {
         )}
       </div>
       <ShareFileDialog open={shareOpen} onOpenChange={setShareOpen} url={shareUrl} />
+      <RenameFileDialog
+        file={fileToRename}
+        token={token}
+        onClose={() => setFileToRename(null)}
+        onRenamed={refetch}
+      <RenameFolderDialog
+        open={!!folderToRename}
+        folderId={folderToRename?.id ?? 0}
+        currentName={folderToRename?.name ?? ''}
+        onOpenChange={(open) => {
+          if (!open) setFolderToRename(null)
+        }}
+        onRename={async (id, name) => {
+          await renameFolder(id, name)
+        }}
+      />
+      <ConfirmFolderDeleteDialog
+        open={!!folderToDelete}
+        folderId={folderToDelete?.id ?? 0}
+        folderName={folderToDelete?.name}
+        onOpenChange={(open) => {
+          if (!open) setFolderToDelete(null)
+        }}
+        onDelete={async (id) => {
+          await deleteFolder(id)
+        }}
+      />
     </div>
   )
 }
