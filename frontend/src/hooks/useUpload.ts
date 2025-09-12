@@ -26,7 +26,7 @@ export function useUpload() {
 
     const { path, token } = await uploadUrlRes.json();
 
-    const storageUrl: string = (supabaseClient as any).storageUrl.href;
+    const storageUrl: string = (supabaseClient as any).storageUrl;
     const cleanPath = path.replace(/^\/|\/$/g, '').replace(/\/+/g, '/');
     const uploadUrl = new URL(
       `object/upload/sign/files/${cleanPath}`,

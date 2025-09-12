@@ -13,8 +13,6 @@ import {
   renameFolderSchema,
 } from './schemas';
 
-console.log("Loading folders.ts");
-
 export default async function (app: FastifyInstance) {
   app.get('/api/folders/:parentId?', { schema: getFoldersSchema }, async (request, reply) => {
     const token = (request.headers.authorization || '').replace('Bearer ', '');

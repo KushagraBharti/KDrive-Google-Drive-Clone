@@ -1,5 +1,4 @@
-import { test } from 'node:test';
-import assert from 'node:assert';
+import { test, expect } from 'vitest';
 import Fastify from 'fastify';
 
 // Provide dummy environment variables expected by the plugin
@@ -20,7 +19,7 @@ test('unauthorized requests receive 401', async () => {
   await app.ready();
 
   const res = await app.inject({ method: 'GET', url: '/api/protected' });
-  assert.strictEqual(res.statusCode, 401);
+  expect(res.statusCode).toBe(401);
 
   await app.close();
 });

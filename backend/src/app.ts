@@ -8,7 +8,6 @@ import {
 import pino from 'pino';
 import rateLimit from '@fastify/rate-limit';
 
-
 import authRoutes from './routes/auth';
 import folderRoutes from './routes/folders';
 import fileRoutes from './routes/files';
@@ -17,10 +16,8 @@ import storageRoutes from './routes/storage';
 import verifySessionPlugin from './plugins/verifySession';
 
 export const app = Fastify({
-  logger: pino({ level: 'info' }),
-});
-
-export const app = Fastify().withTypeProvider<ZodTypeProvider>();
+  logger: { level: 'info' },
+}).withTypeProvider<ZodTypeProvider>();
 
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
