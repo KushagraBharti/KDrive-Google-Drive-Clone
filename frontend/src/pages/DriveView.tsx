@@ -33,6 +33,7 @@ import {
 import type { Folder, File as PrismaFile } from '@prisma/client'
 import { useAuth } from '@/hooks/useAuth'
 import { supabaseClient } from '@/contexts/SupabaseContext'
+import ShareFileDialog from "@/components/ShareFileDialog"
 
 function formatBytes(bytes: number) {
   if (bytes === 0) return "0 B"
@@ -77,7 +78,10 @@ export default function DriveView() {
   const [breadcrumbs, setBreadcrumbs] = useState<Crumb[]>([
     { id: null, name: "My Drive" },
   ])
+  const [shareOpen, setShareOpen] = useState(false)
+  const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [fileToRename, setFileToRename] = useState<PrismaFile | null>(null)
+
 
   useEffect(() => {
     const crumbs = (location.state as any)?.breadcrumbs as Crumb[] | undefined
@@ -161,6 +165,20 @@ export default function DriveView() {
 
   const handleRenameClick = (file: PrismaFile) => {
     setFileToRename(file)
+  }
+
+  const handleShare = async (file: PrismaFile) => {
+    if (!token) return
+    const res = await fetch(`/api/files/${file.id}/share`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    if (res.ok) {
+      const data = await res.json()
+      setShareUrl(data.url)
+      setShareOpen(true)
+      navigator.clipboard.writeText(data.url).catch(() => {})
+    }
   }
 
   type FolderItem = Folder & { type: 'folder' }
@@ -334,7 +352,10 @@ export default function DriveView() {
                             <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700">
                               Open
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700">
+                            <DropdownMenuItem
+                              className="hover:bg-slate-700 focus:bg-slate-700"
+                              onClick={() => handleShare(item)}
+                            >
                               Share
                             </DropdownMenuItem>
                             <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700" onClick={() => handleDownload(item)}>
@@ -386,6 +407,7 @@ export default function DriveView() {
           </div>
         )}
       </div>
+      <ShareFileDialog open={shareOpen} onOpenChange={setShareOpen} url={shareUrl} />
       <RenameFileDialog
         file={fileToRename}
         token={token}
