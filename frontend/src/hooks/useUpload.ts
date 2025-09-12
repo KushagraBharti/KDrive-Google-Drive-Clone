@@ -28,10 +28,8 @@ export function useUpload() {
 
     const storageUrl: string = (supabaseClient as any).storageUrl;
     const cleanPath = path.replace(/^\/|\/$/g, '').replace(/\/+/g, '/');
-    const uploadUrl = new URL(
-      `object/upload/sign/files/${cleanPath}`,
-      storageUrl
-    );
+    const baseUrl = storageUrl.endsWith('/') ? storageUrl : `${storageUrl}/`;
+    const uploadUrl = new URL(`object/upload/sign/files/${cleanPath}`, baseUrl);
     uploadUrl.searchParams.set('token', token);
 
     await new Promise<void>((resolve, reject) => {
