@@ -1,8 +1,9 @@
-import { File, FileText, ImageIcon, Video, Music, Archive } from 'lucide-react'
+import { File as FileIcon, FileText, ImageIcon, Video, Music, Archive } from 'lucide-react'
+import type { File as PrismaFile } from '@prisma/client'
 import type React from 'react'
 
 export interface FileCardProps {
-  name: string
+  file: PrismaFile
   size?: string
   modified?: string
   onClick?: () => void
@@ -36,17 +37,18 @@ function getIcon(fileName: string, big = false) {
     case '7z':
       return <Archive className={`${size} text-yellow-400`} />
     default:
-      return <File className={`${size} text-slate-400`} />
+      return <FileIcon className={`${size} text-slate-400`} />
   }
 }
 
 export default function FileCard({
-  name,
+  file,
   size,
   modified,
   onClick,
   view = 'list',
 }: FileCardProps) {
+  const { name } = file
   if (view === 'grid') {
     return (
       <button
