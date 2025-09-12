@@ -12,34 +12,32 @@
     "prisma:seed": "tsx src/models/seed.ts",
     "test-db": "tsx src/utils/test-db.ts",
     "lint": "eslint . --ext .ts,.tsx --resolve-plugins-relative-to .",
-    "test": "tsx --test test/**/*.test.ts"
     "test": "vitest run"
   },
   "dependencies": {
     "@fastify/cors": "^11.0.1",
     "@fastify/rate-limit": "^10.3.0",
-    "@prisma/client": "6.9.0",
+    "@prisma/client": "^6.9.0",
     "@supabase/supabase-js": "^2.50.0",
     "dotenv": "^16.5.0",
     "fastify": "^5",
     "fastify-type-provider-zod": "^6.0.0",
     "postgres": "^3.4.7",
-    "zod": "^4.1.8"
+    "pino": "^9.9.5",
+    "zod": "^4.1.5"
   },
   "devDependencies": {
-    "pino": "^9.9.5",
-    "postgres": "^3.4.7"
     "@types/node": "^24.3.1",
     "@typescript-eslint/eslint-plugin": "^8.43.0",
     "@typescript-eslint/parser": "^8.43.0",
-    "eslint": "8",
+    "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-react": "^7.37.5",
     "prettier": "^3.6.2",
-    "prisma": "6.9.0",
+    "prisma": "^6.9.0",
     "tsx": "^4.19.4",
     "typescript": "^5.3.3",
-    "vitest": "^3.2.4"
+    "vitest": "^1.6.0"
   }
 }

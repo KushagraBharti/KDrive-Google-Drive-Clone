@@ -5,7 +5,6 @@ import {
   validatorCompiler,
   serializerCompiler,
 } from 'fastify-type-provider-zod';
-import pino from 'pino';
 import rateLimit from '@fastify/rate-limit';
 
 
@@ -17,10 +16,8 @@ import storageRoutes from './routes/storage';
 import verifySessionPlugin from './plugins/verifySession';
 
 export const app = Fastify({
-  logger: pino({ level: 'info' }),
-});
-
-export const app = Fastify().withTypeProvider<ZodTypeProvider>();
+  logger: { level: 'info' },
+}).withTypeProvider<ZodTypeProvider>();
 
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);

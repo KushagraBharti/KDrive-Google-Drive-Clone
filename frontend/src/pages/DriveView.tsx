@@ -413,6 +413,7 @@ export default function DriveView() {
         token={token}
         onClose={() => setFileToRename(null)}
         onRenamed={refetch}
+      />
       <RenameFolderDialog
         open={!!folderToRename}
         folderId={folderToRename?.id ?? 0}
