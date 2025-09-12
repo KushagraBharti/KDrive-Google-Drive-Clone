@@ -3,9 +3,10 @@ import { AuthContext } from '@/contexts/AuthContext'
 
 vi.mock('@/contexts/SupabaseContext', () => {
   const auth = {
-    signInWithPassword: vi.fn(),
-    signUp: vi.fn(),
-    signOut: vi.fn(),
+    signInWithPassword: vi.fn().mockResolvedValue({ data: {}, error: null }),
+    signUp: vi.fn().mockResolvedValue({ data: {}, error: null }),
+    signOut: vi.fn().mockResolvedValue({ error: null }),
+    updateUser: vi.fn().mockResolvedValue({ data: {}, error: null }),
   }
   return { supabaseClient: { auth } }
 })
@@ -13,7 +14,7 @@ vi.mock('@/contexts/SupabaseContext', () => {
 import { supabaseClient } from '@/contexts/SupabaseContext'
 import { useAuth } from '@/hooks/useAuth'
 
-const { signInWithPassword, signUp, signOut } = supabaseClient.auth as any
+const { signInWithPassword, signUp, signOut, updateUser } = supabaseClient.auth as any
 
 describe('useAuth', () => {
   const wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -29,8 +30,9 @@ describe('useAuth', () => {
     await result.current.signInWithEmail('a@b.com', 'pw')
     expect(signInWithPassword).toHaveBeenCalledWith({ email: 'a@b.com', password: 'pw' })
 
-    await result.current.signUpWithEmail('c@d.com', 'pw')
+    await result.current.signUpWithEmail('c@d.com', 'pw', 'Jane')
     expect(signUp).toHaveBeenCalledWith({ email: 'c@d.com', password: 'pw' })
+    expect(updateUser).toHaveBeenCalledWith({ data: { name: 'Jane' } })
 
     await result.current.signOut()
     expect(signOut).toHaveBeenCalled()

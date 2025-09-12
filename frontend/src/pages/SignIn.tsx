@@ -13,11 +13,7 @@ import { Cloud, ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
 
 export default function SignInPage() {
-  const {
-    user,
-    signInWithEmail,
-    signUpWithEmail,
-  } = useAuth()
+  const { user, signInWithEmail, signUpWithEmail } = useAuth()
   const navigate = useNavigate()
   const [isSignUp, setIsSignUp] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -39,7 +35,7 @@ export default function SignInPage() {
     setIsLoading(true)
 
     const { error } = isSignUp
-      ? await signUpWithEmail(email, password)
+      ? await signUpWithEmail(email, password, name)
       : await signInWithEmail(email, password)
 
     setIsLoading(false)
