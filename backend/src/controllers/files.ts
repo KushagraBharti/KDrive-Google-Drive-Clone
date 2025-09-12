@@ -1,11 +1,30 @@
 import prisma from '@/services/prisma';
 import { supabaseAdmin } from '@/services/supabase';
 
-export function getFiles(parentId: number, ownerId: string) {
-  return prisma.file.findMany({
+export async function getFiles(parentId: number, ownerId: string) {
+  const files = await prisma.file.findMany({
     where: { parentId, ownerId },
     orderBy: { id: 'asc' },
   });
+
+  const filesWithUrls = await Promise.all(
+    files.map(async (file) => {
+      const { data, error } = await supabaseAdmin.storage
+        .from('files')
+        .createSignedUrl(file.path, 60);
+
+      if (error) {
+        return file;
+      }
+
+      return {
+        ...file,
+        url: data.signedUrl,
+      };
+    })
+  );
+
+  return filesWithUrls;
 }
 
 export function createFile(args: {

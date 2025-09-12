@@ -11,7 +11,15 @@ export function useUpload() {
       .upload(`${session.user.id}/${Date.now()}-${file.name}`, file);
 
     if (error) throw error;
-    const url = supabaseClient.storage.from('files').getPublicUrl(data.path).data.publicUrl;
+
+    const { data: signedData, error: signedError } = await supabaseClient
+      .storage
+      .from('files')
+      .createSignedUrl(data.path, 60);
+
+    if (signedError) throw signedError;
+
+    const url = signedData.signedUrl;
 
     const res = await fetch('/api/files', {
       method: 'POST',
