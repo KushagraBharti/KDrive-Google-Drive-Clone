@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { Upload } from 'lucide-react'
 import { Button } from './ui/button'
+import { Progress } from './ui/progress'
 import { useUpload } from '@/hooks/useUpload'
 import { toast } from 'sonner'
 
@@ -11,7 +12,7 @@ export interface UploadButtonProps {
 
 export default function UploadButton({ parentId, onUploaded }: UploadButtonProps) {
   const inputRef = useRef<HTMLInputElement>(null)
-  const { uploadFile } = useUpload()
+  const { uploadFile, progress } = useUpload()
 
   const MAX_SIZE_MB = 10
   const allowedTypes = [
@@ -60,10 +61,15 @@ export default function UploadButton({ parentId, onUploaded }: UploadButtonProps
         className="hidden"
         onChange={handleChange}
       />
-      <Button onClick={() => inputRef.current?.click()}>
+      <Button onClick={() => inputRef.current?.click()} disabled={!!progress}>
         <Upload className="w-4 h-4 mr-2" />
         Upload
       </Button>
+      {progress && (
+        <div className="w-full mt-2">
+          <Progress value={(progress.loaded / progress.total) * 100} />
+        </div>
+      )}
     </>
   )
 }
