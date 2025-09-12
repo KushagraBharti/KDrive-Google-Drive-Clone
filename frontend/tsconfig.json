@@ -17,7 +17,8 @@
     "jsx": "react-jsx",
     "types": ["vitest", "vite/client"],
     "baseUrl": "./",
-    "paths": { "@/*": ["src/*"] }
+    "paths": { "@/*": ["src/*"] },
+    "ignoreDeprecations": "6.0"
   },
   "include": ["src", "prisma", "components", "scripts"],
   "exclude": ["node_modules", "dist"]
