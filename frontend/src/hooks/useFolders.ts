@@ -19,19 +19,32 @@ export function useFolders(parentId: number | null) {
     fetchFolders();
   }, [parentId, session]);
 
-  const createFolder = async (name: string) => {
+
+  const renameFolder = async (id: number, name: string) => {
     if (!session) return;
     const token = session.access_token;
-    await fetch('/api/folders', {
-      method: 'POST',
+    const res = await fetch(`/api/folders/${id}`, {
+      method: 'PATCH',
+
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ name, parentId })
+      body: JSON.stringify({ name })
     });
-    await fetchFolders();
+    const data = await res.json();
+    setFolders((prev) => prev.map((f) => (f.id === id ? data : f)));
   };
 
-  return { folders, createFolder, refetch: fetchFolders };
+  const deleteFolder = async (id: number) => {
+    if (!session) return;
+    const token = session.access_token;
+    await fetch(`/api/folders/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    setFolders((prev) => prev.filter((f) => f.id !== id));
+  };
+
+  return { folders, refetch: fetchFolders, renameFolder, deleteFolder };
 }
