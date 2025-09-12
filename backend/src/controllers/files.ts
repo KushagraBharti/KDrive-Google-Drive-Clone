@@ -45,3 +45,10 @@ export async function deleteFile(id: number, ownerId: string) {
   await supabaseAdmin.storage.from('files').remove([file.path]);
   return file;
 }
+
+export function renameFile(id: number, ownerId: string, name: string) {
+  return prisma.file.update({
+    where: { id, ownerId },
+    data: { name },
+  });
+}
