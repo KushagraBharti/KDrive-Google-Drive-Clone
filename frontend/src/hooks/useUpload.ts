@@ -6,21 +6,29 @@ export function useUpload() {
 
   async function uploadFile(file: File, parentId: number) {
     if (!session) throw new Error('Not authenticated');
-    const { data, error } = await supabaseClient.storage
+    // Ask backend for a signed upload token and path (no storage policy needed)
+    const uploadUrlRes = await fetch('/api/storage/signed-upload', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ fileName: file.name }),
+    });
+
+    if (!uploadUrlRes.ok) {
+      throw new Error('Failed to get signed upload URL');
+    }
+
+    const { path, token } = await uploadUrlRes.json();
+
+    const { error: uploadError } = await supabaseClient.storage
       .from('files')
-      .upload(`${session.user.id}/${Date.now()}-${file.name}`, file);
+      .uploadToSignedUrl(path, token, file, { contentType: file.type });
 
-    if (error) throw error;
+    if (uploadError) throw uploadError;
 
-    const { data: signedData, error: signedError } = await supabaseClient
-      .storage
-      .from('files')
-      .createSignedUrl(data.path, 60);
-
-    if (signedError) throw signedError;
-
-    const url = signedData.signedUrl;
-
+    // Persist metadata on the backend (backend generates signed URL for DB)
     const res = await fetch('/api/files', {
       method: 'POST',
       headers: {
@@ -30,8 +38,7 @@ export function useUpload() {
       body: JSON.stringify({
         name: file.name,
         size: file.size,
-        url,
-        path: data.path,
+        path,
         parentId
       })
     })

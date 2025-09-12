@@ -27,15 +27,25 @@ export async function getFiles(parentId: number, ownerId: string) {
   return filesWithUrls;
 }
 
-export function createFile(args: {
+export async function createFile(args: {
   name: string;
   size: number;
-  url: string;
   path: string;
   parentId: number;
   ownerId: string;
 }) {
-  return prisma.file.create({ data: args });
+  // Generate a short-lived signed URL for initial persistence.
+  // Listing re-generates fresh signed URLs, so this value is not relied on long-term.
+  const { data: signed, error } = await supabaseAdmin
+    .storage
+    .from('files')
+    .createSignedUrl(args.path, 60);
+
+  if (error || !signed?.signedUrl) {
+    throw new Error('Failed to create signed URL for file');
+  }
+
+  return prisma.file.create({ data: { ...args, url: signed.signedUrl } });
 }
 
 export async function deleteFile(id: number, ownerId: string) {

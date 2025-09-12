@@ -16,7 +16,8 @@ export default async function (app: FastifyInstance) {
   app.post('/api/files', async (request, reply) => {
     const token = (request.headers.authorization || '').replace('Bearer ', '');
     const user = await verifySession(token);
-    const file = await createFile({ ...(request.body as any), ownerId: user.id });
+    const { name, size, path, parentId } = (request.body as any);
+    const file = await createFile({ name, size, path, parentId, ownerId: user.id });
     reply.send(file);
   });
 

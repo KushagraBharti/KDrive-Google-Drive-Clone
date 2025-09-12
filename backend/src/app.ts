@@ -5,6 +5,7 @@ import authRoutes from './routes/auth';
 import folderRoutes from './routes/folders';
 import fileRoutes from './routes/files';
 import analyticsRoutes from './routes/analytics';
+import storageRoutes from './routes/storage';
 
 export const app = Fastify();
 
@@ -14,3 +15,4 @@ app.register(authRoutes);
 app.register(folderRoutes);
 app.register(fileRoutes);
 app.register(analyticsRoutes);
+app.register(storageRoutes);
