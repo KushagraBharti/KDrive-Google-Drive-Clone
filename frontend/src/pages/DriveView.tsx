@@ -5,6 +5,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom"
 import FolderCard from "@/components/FolderCard"
 import FileCard from "@/components/FileCard"
 import UploadButton from "@/components/UploadButton"
+import Dropzone from "@/components/Dropzone"
 import Breadcrumb, { Crumb } from "@/components/Breadcrumb"
 import { useFolders } from "@/hooks/useFolders"
 import { useFiles } from "@/hooks/useFiles"
@@ -224,176 +225,178 @@ export default function DriveView() {
 
       <Breadcrumb crumbs={breadcrumbs} onNavigate={navigateToBreadcrumb} />
 
-      <div className="p-6">
-        {items.length === 0 ? (
-          <div className="text-center py-12 animate-in fade-in duration-500">
-            <FolderIcon className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-            <p className="text-slate-400 text-lg">
-              {searchQuery ? "No items match your search" : "This folder is empty"}
-            </p>
-          </div>
-        ) : (
-          <div
-            className={
-              viewMode === "grid"
-                ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4"
-                : "space-y-1"
-            }
-          >
-            {items.map((item, index) => (
-              <div
-                key={item.id}
-                className="animate-in fade-in slide-in-from-bottom-2 duration-300"
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                {viewMode === "grid" ? (
-                  <Card className="bg-slate-800/60 border-slate-700/50 hover:bg-slate-700/60 hover:border-slate-600 hover:shadow-xl hover:shadow-slate-900/20 transition-all duration-300 transform hover:scale-105 cursor-pointer backdrop-blur-sm">
-                    <CardContent className="p-4 text-center relative">
-                      {item.type === "folder" ? (
-                        <FolderCard
-                          folder={item}
-                          view="grid"
-                          onClick={() => openFolder(item.id, item.name)}
-                        />
-                      ) : (
-                        <FileCard
-                          file={item}
-                          view="grid"
-                          size={formatBytes(item.size)}
-                          modified={new Date(item.createdAt).toLocaleDateString()}
-                        />
+      <Dropzone parentId={currentFolderId} onUploaded={refetch}>
+        <div className="p-6">
+          {items.length === 0 ? (
+            <div className="text-center py-12 animate-in fade-in duration-500">
+              <FolderIcon className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+              <p className="text-slate-400 text-lg">
+                {searchQuery ? "No items match your search" : "This folder is empty"}
+              </p>
+            </div>
+          ) : (
+            <div
+              className={
+                viewMode === "grid"
+                  ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4"
+                  : "space-y-1"
+              }
+            >
+              {items.map((item, index) => (
+                <div
+                  key={item.id}
+                  className="animate-in fade-in slide-in-from-bottom-2 duration-300"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  {viewMode === "grid" ? (
+                    <Card className="bg-slate-800/60 border-slate-700/50 hover:bg-slate-700/60 hover:border-slate-600 hover:shadow-xl hover:shadow-slate-900/20 transition-all duration-300 transform hover:scale-105 cursor-pointer backdrop-blur-sm">
+                      <CardContent className="p-4 text-center relative">
+                        {item.type === "folder" ? (
+                          <FolderCard
+                            folder={item}
+                            view="grid"
+                            onClick={() => openFolder(item.id, item.name)}
+                          />
+                        ) : (
+                          <FileCard
+                            file={item}
+                            view="grid"
+                            size={formatBytes(item.size)}
+                            modified={new Date(item.createdAt).toLocaleDateString()}
+                          />
+                        )}
+                        {item.type === "folder" && (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="absolute top-2 right-2 w-8 h-8 text-slate-400 hover:text-white hover:bg-slate-700 transition-all duration-200"
+                              >
+                                <MoreVertical className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="bg-slate-800 border-slate-700 text-slate-200">
+                              <DropdownMenuItem
+                                className="hover:bg-slate-700 focus:bg-slate-700"
+                                onClick={() => {
+                                  const name = window.prompt('Rename folder', item.name);
+                                  if (name) renameFolder(item.id, name);
+                                }}
+                              >
+                                Rename
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20"
+                                onClick={() => {
+                                  if (window.confirm('Delete folder?')) deleteFolder(item.id);
+                                }}
+                              >
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <div className="flex items-center justify-between p-3 hover:bg-slate-800/40 rounded-lg transition-all duration-200 backdrop-blur-sm border border-transparent hover:border-slate-700/30">
+                      <div className="flex items-center space-x-3 flex-1">
+                        {item.type === "folder" ? (
+                          <FolderCard
+                            folder={item}
+                            view="list"
+                            onClick={() => openFolder(item.id, item.name)}
+                          />
+                        ) : (
+                          <FileCard
+                            file={item}
+                            view="list"
+                            size={formatBytes(item.size)}
+                            modified={new Date(item.createdAt).toLocaleDateString()}
+                          />
+                        )}
+                      </div>
+                      {item.type === "file" && (
+                        <div className="flex items-center space-x-4 text-sm text-slate-400">
+                          <span className="hover:text-slate-300 transition-colors duration-200">
+                            {new Date(item.createdAt).toLocaleDateString()}
+                          </span>
+                          <span className="hover:text-slate-300 transition-colors duration-200">
+                            {formatBytes(item.size)}
+                          </span>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="w-8 h-8 text-slate-400 hover:text-white hover:bg-slate-700 transition-all duration-200"
+                              >
+                                <MoreVertical className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="bg-slate-800 border-slate-700 text-slate-200">
+                              <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700">
+                                Open
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700">
+                                Share
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700" onClick={() => handleDownload(item)}>
+                                Download
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700" onClick={() => handleRename(item)}>
+                                Rename
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20" onClick={() => handleDelete(item.id)}>
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       )}
                       {item.type === "folder" && (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="absolute top-2 right-2 w-8 h-8 text-slate-400 hover:text-white hover:bg-slate-700 transition-all duration-200"
-                            >
-                              <MoreVertical className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="bg-slate-800 border-slate-700 text-slate-200">
-                            <DropdownMenuItem
-                              className="hover:bg-slate-700 focus:bg-slate-700"
-                              onClick={() => {
-                                const name = window.prompt('Rename folder', item.name);
-                                if (name) renameFolder(item.id, name);
-                              }}
-                            >
-                              Rename
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20"
-                              onClick={() => {
-                                if (window.confirm('Delete folder?')) deleteFolder(item.id);
-                              }}
-                            >
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      )}
-                    </CardContent>
-                  </Card>
-                ) : (
-                  <div className="flex items-center justify-between p-3 hover:bg-slate-800/40 rounded-lg transition-all duration-200 backdrop-blur-sm border border-transparent hover:border-slate-700/30">
-                    <div className="flex items-center space-x-3 flex-1">
-                      {item.type === "folder" ? (
-                        <FolderCard
-                          folder={item}
-                          view="list"
-                          onClick={() => openFolder(item.id, item.name)}
-                        />
-                      ) : (
-                        <FileCard
-                          file={item}
-                          view="list"
-                          size={formatBytes(item.size)}
-                          modified={new Date(item.createdAt).toLocaleDateString()}
-                        />
+                        <div className="flex items-center text-sm text-slate-400">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="w-8 h-8 text-slate-400 hover:text-white hover:bg-slate-700 transition-all duration-200"
+                              >
+                                <MoreVertical className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="bg-slate-800 border-slate-700 text-slate-200">
+                              <DropdownMenuItem
+                                className="hover:bg-slate-700 focus:bg-slate-700"
+                                onClick={() => {
+                                  const name = window.prompt('Rename folder', item.name);
+                                  if (name) renameFolder(item.id, name);
+                                }}
+                              >
+                                Rename
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20"
+                                onClick={() => {
+                                  if (window.confirm('Delete folder?')) deleteFolder(item.id);
+                                }}
+                              >
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       )}
                     </div>
-                    {item.type === "file" && (
-                      <div className="flex items-center space-x-4 text-sm text-slate-400">
-                        <span className="hover:text-slate-300 transition-colors duration-200">
-                          {new Date(item.createdAt).toLocaleDateString()}
-                        </span>
-                        <span className="hover:text-slate-300 transition-colors duration-200">
-                          {formatBytes(item.size)}
-                        </span>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="w-8 h-8 text-slate-400 hover:text-white hover:bg-slate-700 transition-all duration-200"
-                            >
-                              <MoreVertical className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="bg-slate-800 border-slate-700 text-slate-200">
-                            <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700">
-                              Open
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700">
-                              Share
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700" onClick={() => handleDownload(item)}>
-                              Download
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700" onClick={() => handleRename(item)}>
-                              Rename
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20" onClick={() => handleDelete(item.id)}>
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    )}
-                    {item.type === "folder" && (
-                      <div className="flex items-center text-sm text-slate-400">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="w-8 h-8 text-slate-400 hover:text-white hover:bg-slate-700 transition-all duration-200"
-                            >
-                              <MoreVertical className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="bg-slate-800 border-slate-700 text-slate-200">
-                            <DropdownMenuItem
-                              className="hover:bg-slate-700 focus:bg-slate-700"
-                              onClick={() => {
-                                const name = window.prompt('Rename folder', item.name);
-                                if (name) renameFolder(item.id, name);
-                              }}
-                            >
-                              Rename
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20"
-                              onClick={() => {
-                                if (window.confirm('Delete folder?')) deleteFolder(item.id);
-                              }}
-                            >
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </Dropzone>
     </div>
   )
 }
