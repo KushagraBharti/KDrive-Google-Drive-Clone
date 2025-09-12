@@ -7,7 +7,6 @@ import {
 } from 'fastify-type-provider-zod';
 import rateLimit from '@fastify/rate-limit';
 
-
 import authRoutes from './routes/auth';
 import folderRoutes from './routes/folders';
 import fileRoutes from './routes/files';

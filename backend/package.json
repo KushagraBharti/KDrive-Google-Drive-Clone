@@ -34,6 +34,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-react": "^7.37.5",
+    "pino": "^9.9.5",
     "prettier": "^3.6.2",
     "prisma": "^6.9.0",
     "tsx": "^4.19.4",
