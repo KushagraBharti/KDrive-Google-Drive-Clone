@@ -41,4 +41,19 @@ Users can browse nested folders, upload files, and persist everything in your ow
       ```
       Then edit `frontend/.env` and set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
    3. In Supabase Storage, create a `files` bucket with **Private** access.
-      Allow CORS requests from `http://localhost:5173` so local uploads work.
+     Allow CORS requests from `http://localhost:5173` so local uploads work.
+
+5. **Set up the backend**
+   1. Copy `.env.example` to `.env` inside the `backend` directory and fill in `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY`:
+      ```bash
+      cp backend/.env.example backend/.env
+      ```
+   2. Run Prisma migrations:
+      ```bash
+      cd backend
+      yarn prisma:migrate
+      ```
+   3. Start the development server:
+      ```bash
+      yarn dev
+      ```
