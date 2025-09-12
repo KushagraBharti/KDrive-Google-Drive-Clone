@@ -11,6 +11,7 @@ import { useFiles } from "@/hooks/useFiles"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import RenameFileDialog from "@/components/RenameFileDialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -72,6 +73,7 @@ export default function DriveView() {
   const [breadcrumbs, setBreadcrumbs] = useState<Crumb[]>([
     { id: null, name: "My Drive" },
   ])
+  const [fileToRename, setFileToRename] = useState<PrismaFile | null>(null)
 
   useEffect(() => {
     const crumbs = (location.state as any)?.breadcrumbs as Crumb[] | undefined
@@ -151,19 +153,8 @@ export default function DriveView() {
     }
   }
 
-  const handleRename = async (file: PrismaFile) => {
-    if (!token) return
-    const newName = window.prompt('Enter new name', file.name)
-    if (!newName || newName === file.name) return
-    await fetch(`/api/files/${file.id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ name: newName })
-    })
-    refetch()
+  const handleRenameClick = (file: PrismaFile) => {
+    setFileToRename(file)
   }
 
   type FolderItem = Folder & { type: 'folder' }
@@ -343,7 +334,7 @@ export default function DriveView() {
                             <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700" onClick={() => handleDownload(item)}>
                               Download
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700" onClick={() => handleRename(item)}>
+                            <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700" onClick={() => handleRenameClick(item)}>
                               Rename
                             </DropdownMenuItem>
                             <DropdownMenuItem className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20" onClick={() => handleDelete(item.id)}>
@@ -394,6 +385,12 @@ export default function DriveView() {
           </div>
         )}
       </div>
+      <RenameFileDialog
+        file={fileToRename}
+        token={token}
+        onClose={() => setFileToRename(null)}
+        onRenamed={refetch}
+      />
     </div>
   )
 }
