@@ -1,6 +1,8 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import pino from 'pino';
+import rateLimit from '@fastify/rate-limit';
+
 
 import authRoutes from './routes/auth';
 import folderRoutes from './routes/folders';
@@ -10,6 +12,11 @@ import storageRoutes from './routes/storage';
 
 export const app = Fastify({
   logger: pino({ level: 'info' }),
+});
+
+app.register(rateLimit, {
+  max: 100,
+  timeWindow: '1 minute',
 });
 
 app.register(cors, { origin: true });
