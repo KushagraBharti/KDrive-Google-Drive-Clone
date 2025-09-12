@@ -47,7 +47,7 @@ export default function DriveView() {
 
   const currentFolderId = folderId === "root" ? 0 : Number(folderId)
 
-  const { folders, renameFolder, deleteFolder } = useFolders(currentFolderId === 0 ? null : currentFolderId)
+  const { folders, refetch: refetchFolders, renameFolder, deleteFolder } = useFolders(currentFolderId === 0 ? null : currentFolderId)
   const { files, refetch } = useFiles(currentFolderId)
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
@@ -82,6 +82,24 @@ export default function DriveView() {
   }
 
   const token = session?.access_token
+
+  const handleCreateFolder = async () => {
+    if (!token) return
+    const name = window.prompt('Folder name')
+    if (!name) return
+    await fetch('/api/folders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        name,
+        parentId: currentFolderId === 0 ? null : currentFolderId,
+      }),
+    })
+    refetchFolders()
+  }
 
   const handleDelete = async (id: number) => {
     if (!token) return
