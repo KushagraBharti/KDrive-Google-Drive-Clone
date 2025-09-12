@@ -5,15 +5,33 @@ export function useFolders(parentId: number | null) {
   const { session } = useAuth();
   const [folders, setFolders] = useState<any[]>([]);
 
-  useEffect(() => {
+  const fetchFolders = async () => {
     if (!session) return;
     const token = session.access_token;
-    fetch(`/api/folders/${parentId ?? ''}`, {
+    const res = await fetch(`/api/folders/${parentId ?? ''}`, {
       headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => res.json())
-      .then(setFolders);
+    });
+    const data = await res.json();
+    setFolders(data);
+  };
+
+  useEffect(() => {
+    fetchFolders();
   }, [parentId, session]);
 
-  return folders;
+  const createFolder = async (name: string) => {
+    if (!session) return;
+    const token = session.access_token;
+    await fetch('/api/folders', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ name, parentId })
+    });
+    await fetchFolders();
+  };
+
+  return { folders, createFolder, refetch: fetchFolders };
 }
