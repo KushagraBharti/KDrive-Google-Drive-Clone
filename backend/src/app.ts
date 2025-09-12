@@ -1,5 +1,10 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
+import {
+  ZodTypeProvider,
+  validatorCompiler,
+  serializerCompiler,
+} from 'fastify-type-provider-zod';
 import pino from 'pino';
 import rateLimit from '@fastify/rate-limit';
 
@@ -14,6 +19,11 @@ import verifySessionPlugin from './plugins/verifySession';
 export const app = Fastify({
   logger: pino({ level: 'info' }),
 });
+
+export const app = Fastify().withTypeProvider<ZodTypeProvider>();
+
+app.setValidatorCompiler(validatorCompiler);
+app.setSerializerCompiler(serializerCompiler);
 
 app.register(rateLimit, {
   max: 100,
