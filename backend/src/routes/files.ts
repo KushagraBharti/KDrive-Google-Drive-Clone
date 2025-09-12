@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import { createFile, deleteFile, getFiles } from '@/controllers/files';
+import { createFile, deleteFile, getFiles, renameFile } from '@/controllers/files';
 import { verifySession } from '@/controllers/auth';
 
 console.log("Loading files.ts");
@@ -26,5 +26,14 @@ export default async function (app: FastifyInstance) {
     const id = Number((request.params as any).id);
     const deleted = await deleteFile(id, user.id);
     reply.send(deleted);
+  });
+
+  app.patch('/api/files/:id', async (request, reply) => {
+    const token = (request.headers.authorization || '').replace('Bearer ', '');
+    const user = await verifySession(token);
+    const id = Number((request.params as any).id);
+    const { name } = request.body as any;
+    const updated = await renameFile(id, user.id, name);
+    reply.send(updated);
   });
 }

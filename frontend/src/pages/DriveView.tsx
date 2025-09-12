@@ -26,6 +26,7 @@ import {
   Cloud,
 } from "lucide-react"
 import { useAuth } from '@/hooks/useAuth'
+import { supabaseClient } from '@/contexts/SupabaseContext'
 
 function formatBytes(bytes: number) {
   if (bytes === 0) return "0 B"
@@ -37,7 +38,7 @@ function formatBytes(bytes: number) {
 
 export default function DriveView() {
 
-  const { signOut } = useAuth()
+  const { signOut, session } = useAuth()
 
   const { folderId = "root" } = useParams<{ folderId: string }>()
   const navigate = useNavigate()
@@ -77,6 +78,44 @@ export default function DriveView() {
     navigate(crumb.id === null ? "/drive/root" : `/drive/${crumb.id}`, {
       state: { breadcrumbs: newCrumbs },
     })
+  }
+
+  const token = session?.access_token
+
+  const handleDelete = async (id: number) => {
+    if (!token) return
+    await fetch(`/api/files/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    refetch()
+  }
+
+  const handleDownload = async (file: any) => {
+    const { data } = await supabaseClient.storage.from('files').download(file.path)
+    if (data) {
+      const url = URL.createObjectURL(data)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = file.name
+      a.click()
+      URL.revokeObjectURL(url)
+    }
+  }
+
+  const handleRename = async (file: any) => {
+    if (!token) return
+    const newName = window.prompt('Enter new name', file.name)
+    if (!newName || newName === file.name) return
+    await fetch(`/api/files/${file.id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ name: newName })
+    })
+    refetch()
   }
 
   const items = [
@@ -213,13 +252,13 @@ export default function DriveView() {
                             <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700">
                               Share
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700">
+                            <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700" onClick={() => handleDownload(item)}>
                               Download
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700">
+                            <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700" onClick={() => handleRename(item)}>
                               Rename
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20">
+                            <DropdownMenuItem className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20" onClick={() => handleDelete(item.id)}>
                               Delete
                             </DropdownMenuItem>
                           </DropdownMenuContent>
