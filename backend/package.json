@@ -10,7 +10,8 @@
     "prisma:migrate": "prisma migrate dev --schema=src/models/schema.prisma --name init",
     "prisma:generate": "prisma generate --schema=src/models/schema.prisma",
     "prisma:seed": "tsx src/models/seed.ts",
-    "test-db": "tsx src/utils/test-db.ts"
+    "test-db": "tsx src/utils/test-db.ts",
+    "lint": "eslint . --ext .ts,.tsx --resolve-plugins-relative-to ."
   },
   "dependencies": {
     "@fastify/cors": "^11.0.1",
@@ -21,6 +22,14 @@
     "postgres": "^3.4.7"
   },
   "devDependencies": {
+
+    "@typescript-eslint/eslint-plugin": "^8.43.0",
+    "@typescript-eslint/parser": "^8.43.0",
+    "eslint": "8",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-react": "^7.37.5",
+    "prettier": "^3.6.2",
     "prisma": "6.9.0",
     "tsx": "^4.19.4",
     "typescript": "^5.3.3"

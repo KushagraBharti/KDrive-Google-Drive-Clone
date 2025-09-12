@@ -1,0 +1,24 @@
+name: Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install backend dependencies
+        run: yarn --cwd backend install --frozen-lockfile
+      - name: Lint backend
+        run: yarn --cwd backend lint
+      - name: Install frontend dependencies
+        run: yarn --cwd frontend install --frozen-lockfile
+      - name: Lint frontend
+        run: yarn --cwd frontend lint
