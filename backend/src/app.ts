@@ -4,6 +4,7 @@ import cors from '@fastify/cors';
 import authRoutes from './routes/auth';
 import folderRoutes from './routes/folders';
 import fileRoutes from './routes/files';
+import analyticsRoutes from './routes/analytics';
 
 export const app = Fastify();
 
@@ -12,3 +13,4 @@ app.register(cors, { origin: true });
 app.register(authRoutes);
 app.register(folderRoutes);
 app.register(fileRoutes);
+app.register(analyticsRoutes);
