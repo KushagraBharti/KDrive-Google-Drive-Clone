@@ -15,6 +15,11 @@ export default async function (app: FastifyInstance) {
     const token = (request.headers.authorization || '').replace('Bearer ', '');
     const user = await verifySession(token);
     const { parentId } = request.params;
+
+export default async function (app: FastifyInstance) {
+  app.get('/api/files/:parentId', async (request, reply) => {
+    const user = request.user;
+    const parentId = Number((request.params as any).parentId);
     const files = await getFiles(parentId, user.id);
     reply.send(files);
   });

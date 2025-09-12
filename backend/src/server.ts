@@ -7,9 +7,9 @@ const port = Number(process.env.PORT) || 3001;
   try {
     await ensureFilesBucket();
     await app.listen({ port });
-    console.log(`Backend running at http://localhost:${port}`);
+    app.log.info(`Backend running at http://localhost:${port}`);
   } catch (err) {
-    console.error("Failed to start Fastify:", err);
+    app.log.error({ err }, 'Failed to start Fastify');
     process.exit(1);
   }
 })();
