@@ -24,6 +24,7 @@ import {
   List,
   MoreVertical,
   Cloud,
+  FolderPlus,
 } from "lucide-react"
 import { useAuth } from '@/hooks/useAuth'
 import { supabaseClient } from '@/contexts/SupabaseContext'
@@ -46,7 +47,7 @@ export default function DriveView() {
 
   const currentFolderId = folderId === "root" ? 0 : Number(folderId)
 
-  const folders = useFolders(currentFolderId === 0 ? null : currentFolderId)
+  const { folders, renameFolder, deleteFolder } = useFolders(currentFolderId === 0 ? null : currentFolderId)
   const { files, refetch } = useFiles(currentFolderId)
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
@@ -156,6 +157,10 @@ export default function DriveView() {
               )}
             </Button>
             <UploadButton parentId={currentFolderId} onUploaded={refetch} />
+            <Button onClick={handleCreateFolder}>
+              <FolderPlus className="w-4 h-4 mr-2" />
+              New Folder
+            </Button>
             <Button 
               variant="default" 
               onClick={signOut} 
@@ -192,7 +197,7 @@ export default function DriveView() {
               >
                 {viewMode === "grid" ? (
                   <Card className="bg-slate-800/60 border-slate-700/50 hover:bg-slate-700/60 hover:border-slate-600 hover:shadow-xl hover:shadow-slate-900/20 transition-all duration-300 transform hover:scale-105 cursor-pointer backdrop-blur-sm">
-                    <CardContent className="p-4 text-center">
+                    <CardContent className="p-4 text-center relative">
                       {item.type === "folder" ? (
                         <FolderCard
                           name={item.name}
@@ -206,6 +211,38 @@ export default function DriveView() {
                           size={formatBytes(item.size)}
                           modified={new Date(item.createdAt).toLocaleDateString()}
                         />
+                      )}
+                      {item.type === "folder" && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="absolute top-2 right-2 w-8 h-8 text-slate-400 hover:text-white hover:bg-slate-700 transition-all duration-200"
+                            >
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="bg-slate-800 border-slate-700 text-slate-200">
+                            <DropdownMenuItem
+                              className="hover:bg-slate-700 focus:bg-slate-700"
+                              onClick={() => {
+                                const name = window.prompt('Rename folder', item.name);
+                                if (name) renameFolder(item.id, name);
+                              }}
+                            >
+                              Rename
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20"
+                              onClick={() => {
+                                if (window.confirm('Delete folder?')) deleteFolder(item.id);
+                              }}
+                            >
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       )}
                     </CardContent>
                   </Card>
@@ -259,6 +296,40 @@ export default function DriveView() {
                               Rename
                             </DropdownMenuItem>
                             <DropdownMenuItem className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20" onClick={() => handleDelete(item.id)}>
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    )}
+                    {item.type === "folder" && (
+                      <div className="flex items-center text-sm text-slate-400">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="w-8 h-8 text-slate-400 hover:text-white hover:bg-slate-700 transition-all duration-200"
+                            >
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="bg-slate-800 border-slate-700 text-slate-200">
+                            <DropdownMenuItem
+                              className="hover:bg-slate-700 focus:bg-slate-700"
+                              onClick={() => {
+                                const name = window.prompt('Rename folder', item.name);
+                                if (name) renameFolder(item.id, name);
+                              }}
+                            >
+                              Rename
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20"
+                              onClick={() => {
+                                if (window.confirm('Delete folder?')) deleteFolder(item.id);
+                              }}
+                            >
                               Delete
                             </DropdownMenuItem>
                           </DropdownMenuContent>
