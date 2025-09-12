@@ -48,8 +48,24 @@ export default function DriveView() {
 
   const currentFolderId = folderId === "root" ? 0 : Number(folderId)
 
-  const { folders, refetch: refetchFolders, renameFolder, deleteFolder } = useFolders(currentFolderId === 0 ? null : currentFolderId)
-  const { files, refetch } = useFiles(currentFolderId)
+  const {
+    folders,
+    refetch: refetchFolders,
+    renameFolder,
+    deleteFolder,
+    isLoading: foldersLoading,
+    error: foldersErrorObj
+  } = useFolders(currentFolderId === 0 ? null : currentFolderId)
+
+  const {
+    files,
+    refetch,
+    isLoading: filesLoading,
+    error: filesErrorObj
+  } = useFiles(currentFolderId)
+
+  const isLoading = foldersLoading || filesLoading
+  const error = foldersErrorObj || filesErrorObj
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [searchQuery, setSearchQuery] = useState("")
@@ -83,6 +99,18 @@ export default function DriveView() {
   }
 
   const token = session?.access_token
+
+  if (isLoading) {
+    return <div className="flex items-center justify-center h-full">Loading...</div>
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-full text-red-500">
+        Error loading drive
+      </div>
+    )
+  }
 
   const handleCreateFolder = async () => {
     if (!token) return
