@@ -11,7 +11,6 @@ export function useUpload() {
       .upload(`${session.user.id}/${Date.now()}-${file.name}`, file);
 
     if (error) throw error;
-
     const url = supabaseClient.storage.from('files').getPublicUrl(data.path).data.publicUrl;
 
     const res = await fetch('/api/files', {
@@ -24,6 +23,7 @@ export function useUpload() {
         name: file.name,
         size: file.size,
         url,
+        path: data.path,
         parentId
       })
     })

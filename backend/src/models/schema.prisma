@@ -35,6 +35,7 @@ model File {
   name      String
   size      Int
   url       String
+  path      String
   parentId  Int
   ownerId   String
   createdAt DateTime @default(now())
