@@ -53,6 +53,10 @@ Users can browse nested folders, upload files, and persist everything in your ow
       cd backend
       yarn prisma:migrate
       ```
+      When deploying, use the deploy subcommand instead:
+      ```bash
+      yarn prisma:deploy
+      ```
    3. Start the development server:
       ```bash
       yarn dev
