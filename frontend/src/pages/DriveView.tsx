@@ -5,12 +5,17 @@ import { useParams, useNavigate, useLocation } from "react-router-dom"
 import FolderCard from "@/components/FolderCard"
 import FileCard from "@/components/FileCard"
 import UploadButton from "@/components/UploadButton"
+import Dropzone from "@/components/Dropzone"
 import Breadcrumb, { Crumb } from "@/components/Breadcrumb"
+import RenameFolderDialog from "@/components/RenameFolderDialog"
+import ConfirmFolderDeleteDialog from "@/components/ConfirmFolderDeleteDialog"
+import NewFolderDialog from "@/components/NewFolderDialog"
 import { useFolders } from "@/hooks/useFolders"
 import { useFiles } from "@/hooks/useFiles"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import RenameFileDialog from "@/components/RenameFileDialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,8 +31,10 @@ import {
   Cloud,
   FolderPlus,
 } from "lucide-react"
+import type { Folder, File as PrismaFile } from '@prisma/client'
 import { useAuth } from '@/hooks/useAuth'
 import { supabaseClient } from '@/contexts/SupabaseContext'
+import ShareFileDialog from "@/components/ShareFileDialog"
 
 function formatBytes(bytes: number) {
   if (bytes === 0) return "0 B"
@@ -47,14 +54,35 @@ export default function DriveView() {
 
   const currentFolderId = folderId === "root" ? 0 : Number(folderId)
 
-  const { folders, refetch: refetchFolders, renameFolder, deleteFolder } = useFolders(currentFolderId === 0 ? null : currentFolderId)
-  const { files, refetch } = useFiles(currentFolderId)
+  const {
+    folders,
+    refetch: refetchFolders,
+    renameFolder,
+    deleteFolder,
+    isLoading: foldersLoading,
+    error: foldersErrorObj
+  } = useFolders(currentFolderId === 0 ? null : currentFolderId)
+
+  const {
+    files,
+    refetch,
+    isLoading: filesLoading,
+    error: filesErrorObj
+  } = useFiles(currentFolderId)
+
+  const isLoading = foldersLoading || filesLoading
+  const error = foldersErrorObj || filesErrorObj
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [searchQuery, setSearchQuery] = useState("")
+  const [newFolderOpen, setNewFolderOpen] = useState(false)
   const [breadcrumbs, setBreadcrumbs] = useState<Crumb[]>([
     { id: null, name: "My Drive" },
   ])
+  const [shareOpen, setShareOpen] = useState(false)
+  const [shareUrl, setShareUrl] = useState<string | null>(null)
+  const [fileToRename, setFileToRename] = useState<PrismaFile | null>(null)
+
 
   useEffect(() => {
     const crumbs = (location.state as any)?.breadcrumbs as Crumb[] | undefined
@@ -81,12 +109,25 @@ export default function DriveView() {
     })
   }
 
+  const [folderToRename, setFolderToRename] = useState<Folder | null>(null)
+  const [folderToDelete, setFolderToDelete] = useState<Folder | null>(null)
+
   const token = session?.access_token
 
-  const handleCreateFolder = async () => {
-    if (!token) return
-    const name = window.prompt('Folder name')
-    if (!name) return
+  if (isLoading) {
+    return <div className="flex items-center justify-center h-full">Loading...</div>
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-full text-red-500">
+        Error loading drive
+      </div>
+    )
+  }
+
+  const handleCreateFolder = async (name: string) => {
+    if (!token || !name) return
     await fetch('/api/folders', {
       method: 'POST',
       headers: {
@@ -99,6 +140,7 @@ export default function DriveView() {
       }),
     })
     refetchFolders()
+    setNewFolderOpen(false)
   }
 
   const handleDelete = async (id: number) => {
@@ -110,7 +152,7 @@ export default function DriveView() {
     refetch()
   }
 
-  const handleDownload = async (file: any) => {
+  const handleDownload = async (file: PrismaFile) => {
     const { data } = await supabaseClient.storage.from('files').download(file.path)
     if (data) {
       const url = URL.createObjectURL(data)
@@ -122,28 +164,41 @@ export default function DriveView() {
     }
   }
 
-  const handleRename = async (file: any) => {
-    if (!token) return
-    const newName = window.prompt('Enter new name', file.name)
-    if (!newName || newName === file.name) return
-    await fetch(`/api/files/${file.id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ name: newName })
-    })
-    refetch()
+  const handleRenameClick = (file: PrismaFile) => {
+    setFileToRename(file)
   }
 
-  const items = [
-    ...filteredFolders.map((f) => ({ ...f, type: "folder" as const })),
-    ...filteredFiles.map((f) => ({ ...f, type: "file" as const })),
+  const handleShare = async (file: PrismaFile) => {
+    if (!token) return
+    const res = await fetch(`/api/files/${file.id}/share`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    if (res.ok) {
+      const data = await res.json()
+      setShareUrl(data.url)
+      setShareOpen(true)
+      navigator.clipboard.writeText(data.url).catch(() => {})
+    }
+  }
+
+  type FolderItem = Folder & { type: 'folder' }
+  type FileItem = PrismaFile & { type: 'file' }
+  type Item = FolderItem | FileItem
+
+  const items: Item[] = [
+    ...filteredFolders.map((f): FolderItem => ({ ...f, type: 'folder' })),
+    ...filteredFiles.map((f): FileItem => ({ ...f, type: 'file' })),
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <Dropzone parentId={currentFolderId} onUploaded={refetch}>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <NewFolderDialog
+        open={newFolderOpen}
+        onOpenChange={setNewFolderOpen}
+        onCreate={handleCreateFolder}
+      />
       <div className="bg-slate-800/80 backdrop-blur-sm border-b border-slate-700/50 px-6 py-4 shadow-lg">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
@@ -175,7 +230,7 @@ export default function DriveView() {
               )}
             </Button>
             <UploadButton parentId={currentFolderId} onUploaded={refetch} />
-            <Button onClick={handleCreateFolder}>
+            <Button onClick={() => setNewFolderOpen(true)}>
               <FolderPlus className="w-4 h-4 mr-2" />
               New Folder
             </Button>
@@ -218,13 +273,13 @@ export default function DriveView() {
                     <CardContent className="p-4 text-center relative">
                       {item.type === "folder" ? (
                         <FolderCard
-                          name={item.name}
+                          folder={item}
                           view="grid"
                           onClick={() => openFolder(item.id, item.name)}
                         />
                       ) : (
                         <FileCard
-                          name={item.name}
+                          file={item}
                           view="grid"
                           size={formatBytes(item.size)}
                           modified={new Date(item.createdAt).toLocaleDateString()}
@@ -244,18 +299,13 @@ export default function DriveView() {
                           <DropdownMenuContent align="end" className="bg-slate-800 border-slate-700 text-slate-200">
                             <DropdownMenuItem
                               className="hover:bg-slate-700 focus:bg-slate-700"
-                              onClick={() => {
-                                const name = window.prompt('Rename folder', item.name);
-                                if (name) renameFolder(item.id, name);
-                              }}
+                              onClick={() => setFolderToRename(item)}
                             >
                               Rename
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20"
-                              onClick={() => {
-                                if (window.confirm('Delete folder?')) deleteFolder(item.id);
-                              }}
+                              onClick={() => setFolderToDelete(item)}
                             >
                               Delete
                             </DropdownMenuItem>
@@ -269,13 +319,13 @@ export default function DriveView() {
                     <div className="flex items-center space-x-3 flex-1">
                       {item.type === "folder" ? (
                         <FolderCard
-                          name={item.name}
+                          folder={item}
                           view="list"
                           onClick={() => openFolder(item.id, item.name)}
                         />
                       ) : (
                         <FileCard
-                          name={item.name}
+                          file={item}
                           view="list"
                           size={formatBytes(item.size)}
                           modified={new Date(item.createdAt).toLocaleDateString()}
@@ -304,13 +354,16 @@ export default function DriveView() {
                             <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700">
                               Open
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700">
+                            <DropdownMenuItem
+                              className="hover:bg-slate-700 focus:bg-slate-700"
+                              onClick={() => handleShare(item)}
+                            >
                               Share
                             </DropdownMenuItem>
                             <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700" onClick={() => handleDownload(item)}>
                               Download
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700" onClick={() => handleRename(item)}>
+                            <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700" onClick={() => handleRenameClick(item)}>
                               Rename
                             </DropdownMenuItem>
                             <DropdownMenuItem className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20" onClick={() => handleDelete(item.id)}>
@@ -335,18 +388,13 @@ export default function DriveView() {
                           <DropdownMenuContent align="end" className="bg-slate-800 border-slate-700 text-slate-200">
                             <DropdownMenuItem
                               className="hover:bg-slate-700 focus:bg-slate-700"
-                              onClick={() => {
-                                const name = window.prompt('Rename folder', item.name);
-                                if (name) renameFolder(item.id, name);
-                              }}
+                              onClick={() => setFolderToRename(item)}
                             >
                               Rename
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20"
-                              onClick={() => {
-                                if (window.confirm('Delete folder?')) deleteFolder(item.id);
-                              }}
+                              onClick={() => setFolderToDelete(item)}
                             >
                               Delete
                             </DropdownMenuItem>
@@ -361,6 +409,36 @@ export default function DriveView() {
           </div>
         )}
       </div>
-    </div>
+      <ShareFileDialog open={shareOpen} onOpenChange={setShareOpen} url={shareUrl} />
+      <RenameFileDialog
+        file={fileToRename}
+        token={token}
+        onClose={() => setFileToRename(null)}
+        onRenamed={refetch}
+      />
+      <RenameFolderDialog
+        open={!!folderToRename}
+        folderId={folderToRename?.id ?? 0}
+        currentName={folderToRename?.name ?? ''}
+        onOpenChange={(open) => {
+          if (!open) setFolderToRename(null)
+        }}
+        onRename={async (id, name) => {
+          await renameFolder(id, name)
+        }}
+      />
+      <ConfirmFolderDeleteDialog
+        open={!!folderToDelete}
+        folderId={folderToDelete?.id ?? 0}
+        folderName={folderToDelete?.name}
+        onOpenChange={(open) => {
+          if (!open) setFolderToDelete(null)
+        }}
+        onDelete={async (id) => {
+          await deleteFolder(id)
+        }}
+      />
+      </div>
+    </Dropzone>
   )
 }

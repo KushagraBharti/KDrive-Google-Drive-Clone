@@ -53,7 +53,15 @@ Users can browse nested folders, upload files, and persist everything in your ow
       cd backend
       yarn prisma:migrate
       ```
+      When deploying, use the deploy subcommand instead:
+      ```bash
+      yarn prisma:deploy
+      ```
    3. Start the development server:
       ```bash
       yarn dev
       ```
+
+## Rate Limiting
+
+The backend uses `@fastify/rate-limit` to throttle incoming requests. By default, each client can make up to 100 requests per minute. The `/ingest` analytics endpoint allows up to 1000 requests per minute.

@@ -1,15 +1,15 @@
+// backend/src/server.ts
 import { app } from './app';
-import { ensureFilesBucket } from './utils/ensureBucket';
 
 const port = Number(process.env.PORT) || 3001;
 
 (async () => {
   try {
-    await ensureFilesBucket();
+    // NOTE: no storage/bucket calls on boot — we keep those lazy.
     await app.listen({ port });
-    console.log(`Backend running at http://localhost:${port}`);
+    app.log.info(`Backend running at http://localhost:${port}`);
   } catch (err) {
-    console.error("Failed to start Fastify:", err);
+    app.log.error({ err }, 'Failed to start Fastify');
     process.exit(1);
   }
 })();

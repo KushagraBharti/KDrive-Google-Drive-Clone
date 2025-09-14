@@ -1,5 +1,7 @@
 import { renderHook, waitFor } from '@testing-library/react'
 import { useFolders } from '@/hooks/useFolders'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import type { ReactNode } from 'react'
 
 const mockAuth = { session: { access_token: 'token' } }
 vi.mock('@/hooks/useAuth', () => ({
@@ -11,16 +13,22 @@ describe('useFolders', () => {
     global.fetch = vi
       .fn()
       .mockResolvedValueOnce({
+        ok: true,
         json: () => Promise.resolve([{ id: 1, name: 'Folder' }]),
       })
       .mockResolvedValueOnce({
+        ok: true,
         json: () => Promise.resolve({ id: 1, name: 'Renamed' }),
       })
-      .mockResolvedValueOnce({}) as any
+      .mockResolvedValueOnce({ ok: true }) as any
   })
 
   it('handles fetching, renaming and deleting', async () => {
-    const { result } = renderHook(() => useFolders(null))
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={new QueryClient()}>{children}</QueryClientProvider>
+    )
+
+    const { result } = renderHook(() => useFolders(null), { wrapper })
 
     await waitFor(() => {
       expect(result.current.folders).toEqual([{ id: 1, name: 'Folder' }])
