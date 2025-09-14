@@ -1,44 +1,53 @@
+// backend/src/plugins/verifySession.ts
 import fp from 'fastify-plugin';
-import { verifySession } from '@/controllers/auth';
+import type { FastifyPluginAsync } from 'fastify';
+import { supabaseAdmin } from '@/services/supabase';
 
 declare module 'fastify' {
   interface FastifyRequest {
-    /**
-     * Authenticated user returned by verifySession.
-     */
-    user: any;
+    user?: { id: string; email?: string | null };
   }
 }
 
-/**
- * Fastify plugin that verifies the session for all `/api` routes.
- *
- * The plugin reads the `Authorization` header, validates the token using
- * `verifySession` and attaches the resulting user object to `request.user`.
- * Any failure results in a `401 Unauthorized` response.
- */
-export default fp(async function verifySessionPlugin(app) {
-  app.decorateRequest('user', null);
+const verifySessionPlugin: FastifyPluginAsync = async (app) => {
+  app.decorateRequest('user', undefined);
 
-  app.addHook('preHandler', async (request, reply) => {
-    // Skip non-API routes (e.g. analytics ingest)
-    if (!request.raw.url?.startsWith('/api')) return;
+  app.addHook('preHandler', async (req, reply) => {
+    // Public endpoints (adjust as needed)
+    const url = req.url;
+    if (
+      url === '/' ||
+      url.startsWith('/health') ||
+      url.startsWith('/auth') // your auth routes should remain open
+    ) {
+      return;
+    }
 
-    const token = (request.headers.authorization || '').replace('Bearer ', '');
+    // Expect a Supabase JWT in Authorization: Bearer <token>
+    const auth = req.headers.authorization;
+    const bearer = auth?.startsWith('Bearer ') ? auth.slice(7) : undefined;
 
-    // Immediately return 401 if no token is provided
+    // (Optional) support cookie-based token if you set it on the client
+    const cookieToken =
+      // @ts-ignore - cookies only exist if you register cookie plugin
+      (req.cookies?.['sb-access-token'] as string | undefined) ||
+      // some apps store a different cookie name
+      // @ts-ignore
+      (req.cookies?.['access_token'] as string | undefined);
+
+    const token = bearer || cookieToken;
     if (!token) {
-      reply.code(401).send({ error: 'Unauthorized' });
-      return;
+      return reply.code(401).send({ error: 'Missing Authorization bearer token' });
     }
 
-    try {
-      const user = await verifySession(token);
-      request.user = user;
-    } catch {
-      reply.code(401).send({ error: 'Unauthorized' });
-      return;
+    // Validate token with Admin client
+    const { data, error } = await supabaseAdmin.auth.getUser(token);
+    if (error || !data?.user) {
+      return reply.code(401).send({ error: 'Invalid or expired token' });
     }
+
+    req.user = { id: data.user.id, email: data.user.email ?? null };
   });
-});
+};
 
+export default fp(verifySessionPlugin);

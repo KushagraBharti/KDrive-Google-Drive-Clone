@@ -1,11 +1,11 @@
+// backend/src/server.ts
 import { app } from './app';
-import { ensureFilesBucket } from './utils/ensureBucket';
 
 const port = Number(process.env.PORT) || 3001;
 
 (async () => {
   try {
-    await ensureFilesBucket();
+    // NOTE: no storage/bucket calls on boot — we keep those lazy.
     await app.listen({ port });
     app.log.info(`Backend running at http://localhost:${port}`);
   } catch (err) {
