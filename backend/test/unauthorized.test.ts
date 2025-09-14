@@ -3,6 +3,7 @@ import Fastify from 'fastify';
 
 // Provide dummy environment variables expected by the plugin
 process.env.DATABASE_URL = 'postgresql://localhost/test';
+process.env.DIRECT_URL = 'postgresql://localhost/test';
 process.env.SUPABASE_URL = 'http://localhost';
 process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role';
 process.env.SUPABASE_ANON_KEY = 'anon-key';

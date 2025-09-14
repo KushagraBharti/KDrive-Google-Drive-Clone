@@ -7,6 +7,7 @@ export default defineConfig({
     setupFiles: ['./tests/setup.ts'],
     env: {
       DATABASE_URL: 'postgres://localhost/test',
+      DIRECT_URL: 'postgres://localhost/test',
       SUPABASE_URL: 'http://localhost',
       SUPABASE_SERVICE_ROLE_KEY: 'test',
     },
