@@ -8,6 +8,8 @@ import { initPosthog } from './lib/posthog'
 
 initPosthog()
 
+// testing 123
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <AuthProvider>
