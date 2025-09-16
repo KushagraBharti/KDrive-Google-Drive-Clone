@@ -7,9 +7,10 @@ import { toast } from 'sonner'
 export interface UploadButtonProps {
   parentId: number
   onUploaded?: () => void
+  className?: string
 }
 
-export default function UploadButton({ parentId, onUploaded }: UploadButtonProps) {
+export default function UploadButton({ parentId, onUploaded, className }: UploadButtonProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const { uploadFile } = useUpload()
 
@@ -60,7 +61,7 @@ export default function UploadButton({ parentId, onUploaded }: UploadButtonProps
         className="hidden"
         onChange={handleChange}
       />
-      <Button onClick={() => inputRef.current?.click()}>
+      <Button onClick={() => inputRef.current?.click()} className={className}>
         <Upload className="w-4 h-4 mr-2" />
         Upload
       </Button>
