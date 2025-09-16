@@ -1,5 +1,6 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
+import multipart from '@fastify/multipart';
 
 import authRoutes from './routes/auth';
 import folderRoutes from './routes/folders';
@@ -10,6 +11,11 @@ import storageRoutes from './routes/storage';
 export const app = Fastify();
 
 app.register(cors, { origin: true });
+app.register(multipart, {
+  limits: {
+    fileSize: 10 * 1024 * 1024,
+  },
+});
 
 app.register(authRoutes);
 app.register(folderRoutes);

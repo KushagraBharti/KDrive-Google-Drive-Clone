@@ -1,52 +1,60 @@
-import { useAuth } from './useAuth';
-import { supabaseClient } from '@/contexts/SupabaseContext';
+import { useAuth } from './useAuth'
+
+export interface UploadCallbacks {
+  onProgress?: (progress: number) => void
+}
 
 export function useUpload() {
-  const { session } = useAuth();
+  const { session } = useAuth()
 
-  async function uploadFile(file: File, parentId: number) {
-    if (!session) throw new Error('Not authenticated');
-    // Ask backend for a signed upload token and path (no storage policy needed)
-    const uploadUrlRes = await fetch('/api/storage/signed-upload', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${session.access_token}`,
-      },
-      body: JSON.stringify({ fileName: file.name }),
-    });
+  async function uploadFile(
+    file: File,
+    parentId: number,
+    callbacks?: UploadCallbacks
+  ) {
+    if (!session) throw new Error('Not authenticated')
 
-    if (!uploadUrlRes.ok) {
-      throw new Error('Failed to get signed upload URL');
-    }
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('parentId', String(parentId))
 
-    const { path, token } = await uploadUrlRes.json();
+    await new Promise<void>((resolve, reject) => {
+      const xhr = new XMLHttpRequest()
+      xhr.open('POST', '/api/files')
+      xhr.responseType = 'json'
+      xhr.setRequestHeader('Authorization', `Bearer ${session.access_token}`)
+      xhr.setRequestHeader('Accept', 'application/json')
 
-    const { error: uploadError } = await supabaseClient.storage
-      .from('files')
-      .uploadToSignedUrl(path, token, file, { contentType: file.type });
+      callbacks?.onProgress?.(0)
 
-    if (uploadError) throw uploadError;
+      xhr.upload.onprogress = event => {
+        if (!callbacks?.onProgress) return
+        if (event.lengthComputable) {
+          const progress = Math.round((event.loaded / event.total) * 100)
+          callbacks.onProgress(progress)
+        }
+      }
 
-    // Persist metadata on the backend (backend generates signed URL for DB)
-    const res = await fetch('/api/files', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${session.access_token}`
-      },
-      body: JSON.stringify({
-        name: file.name,
-        size: file.size,
-        path,
-        parentId
-      })
+      xhr.onerror = () => {
+        reject(new Error('Upload failed'))
+      }
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          callbacks?.onProgress?.(100)
+          resolve()
+          return
+        }
+
+        const response = xhr.response as { error?: string } | null
+        const message =
+          response?.error || xhr.statusText || 'Upload failed'
+        reject(new Error(message))
+      }
+
+      xhr.send(formData)
     })
-
-    if (!res.ok) {
-      throw new Error('Failed to save file metadata')
-    }
   }
 
-  return { uploadFile };
+  return { uploadFile }
 }
