@@ -20,6 +20,7 @@ import {
 import { Folder as FolderIcon, MoreVertical } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
 import { supabaseClient } from "@/contexts/SupabaseContext"
+import { CreateFolderDialog } from "@/components/CreateFolderDialog"
 
 function formatBytes(bytes: number) {
   if (bytes === 0) return "0 B"
@@ -55,6 +56,7 @@ export default function DriveView() {
     { id: null, name: "My Drive" },
   ])
   const [isContentVisible, setIsContentVisible] = useState(false)
+  const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false)
 
   const isLoading = foldersLoading || filesLoading
 
@@ -95,23 +97,7 @@ export default function DriveView() {
 
   const token = session?.access_token
 
-  const handleCreateFolder = async () => {
-    if (!token) return
-    const name = window.prompt("Folder name")
-    if (!name) return
-    await fetch("/api/folders", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        name,
-        parentId: currentFolderId === 0 ? null : currentFolderId,
-      }),
-    })
-    refetchFolders()
-  }
+  const handleCreateFolder = () => setIsCreateFolderOpen(true)
 
   const handleDelete = async (id: number) => {
     if (!token) return
@@ -360,6 +346,14 @@ export default function DriveView() {
           )}
         </div>
       </main>
+
+      <CreateFolderDialog
+        open={isCreateFolderOpen}
+        onOpenChange={setIsCreateFolderOpen}
+        parentId={currentFolderId}
+        authToken={token}
+        onCreated={refetchFolders}
+      />
     </div>
   )
 }
