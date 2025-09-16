@@ -36,7 +36,7 @@ function getIcon(fileName: string, big = false) {
     case '7z':
       return <Archive className={`${size} text-yellow-400`} />
     default:
-      return <File className={`${size} text-slate-400`} />
+      return <File className={`${size} text-muted-foreground`} />
   }
 }
 
@@ -52,14 +52,14 @@ export default function FileCard({
       <button
         type="button"
         onClick={onClick}
-        className="flex flex-col items-center justify-center space-y-2 w-full"
+        className="flex w-full flex-col items-center justify-center space-y-2"
       >
         {getIcon(name, true)}
-        <span className="text-sm font-medium text-slate-200 truncate w-full text-center">
+        <span className="w-full truncate text-center text-sm font-medium text-foreground">
           {name}
         </span>
         {(size || modified) && (
-          <span className="text-xs text-slate-400 truncate w-full text-center">
+          <span className="w-full truncate text-center text-xs text-muted-foreground">
             {modified}
             {modified && size && ' • '}
             {size}
@@ -73,13 +73,13 @@ export default function FileCard({
     <button
       type="button"
       onClick={onClick}
-      className="flex items-center space-x-3 text-left hover:bg-slate-800/40 p-2 rounded-md w-full"
+      className="flex w-full items-center space-x-3 rounded-md p-2 text-left transition-colors hover:bg-muted/60"
     >
       {getIcon(name)}
       <div className="flex flex-col flex-1">
-        <span className="font-medium text-slate-200">{name}</span>
+        <span className="font-medium text-foreground">{name}</span>
         {(size || modified) && (
-          <span className="text-sm text-slate-400">
+          <span className="text-sm text-muted-foreground">
             {modified}
             {modified && size && ' • '}
             {size}

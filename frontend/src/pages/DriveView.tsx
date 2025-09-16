@@ -162,7 +162,7 @@ export default function DriveView() {
   const skeletonCount = viewMode === "grid" ? 8 : 5
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="flex min-h-screen flex-col bg-gradient-to-br from-background via-muted/30 to-background text-foreground">
       <Navbar
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
@@ -184,9 +184,9 @@ export default function DriveView() {
               ))}
             </div>
           ) : items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-700/60 bg-slate-800/40 px-4 py-12 text-center shadow-inner shadow-slate-900/40">
-              <FolderIcon className="mb-4 h-16 w-16 text-slate-600" />
-              <p className="text-base text-slate-400 sm:text-lg">
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/60 bg-muted/40 px-4 py-12 text-center shadow-inner shadow-foreground/10">
+              <FolderIcon className="mb-4 h-16 w-16 text-muted-foreground" />
+              <p className="text-base text-muted-foreground sm:text-lg">
                 {searchQuery ? "No items match your search" : "This folder is empty"}
               </p>
             </div>
@@ -203,7 +203,7 @@ export default function DriveView() {
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   {viewMode === "grid" ? (
-                    <Card className="group h-full overflow-hidden border border-slate-700/50 bg-slate-800/60 shadow-lg shadow-slate-900/20 transition-all duration-300 hover:-translate-y-1 hover:border-slate-600 hover:bg-slate-800/80">
+                    <Card className="group h-full overflow-hidden border border-border/60 bg-muted/60 shadow-lg shadow-foreground/10 transition-all duration-300 hover:-translate-y-1 hover:border-border hover:bg-muted/80">
                       <CardContent className="relative flex h-full flex-col items-center justify-center gap-4 px-4 py-6 text-center sm:px-6">
                         {item.type === "folder" ? (
                           <FolderCard
@@ -225,14 +225,14 @@ export default function DriveView() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="absolute right-3 top-3 h-9 w-9 rounded-full text-slate-400 transition-colors duration-200 hover:bg-slate-700 hover:text-white"
+                                className="absolute right-3 top-3 h-9 w-9 rounded-full text-muted-foreground transition-colors duration-200 hover:bg-muted hover:text-foreground"
                               >
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-40 rounded-xl border border-slate-700/60 bg-slate-800/95 text-slate-200 backdrop-blur">
+                            <DropdownMenuContent align="end" className="w-40 rounded-xl border border-border/60 bg-popover text-foreground backdrop-blur">
                               <DropdownMenuItem
-                                className="hover:bg-slate-700 focus:bg-slate-700"
+                                className="hover:bg-muted focus:bg-muted"
                                 onClick={() => {
                                   const name = window.prompt("Rename folder", item.name)
                                   if (name) renameFolder(item.id, name)
@@ -241,7 +241,7 @@ export default function DriveView() {
                                 Rename
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20"
+                                className="text-destructive hover:bg-destructive/10 focus:bg-destructive/10"
                                 onClick={() => {
                                   if (window.confirm("Delete folder?")) deleteFolder(item.id)
                                 }}
@@ -254,7 +254,7 @@ export default function DriveView() {
                       </CardContent>
                     </Card>
                   ) : (
-                    <div className="flex flex-col gap-4 rounded-2xl border border-slate-700/40 bg-slate-800/60 p-4 shadow-sm shadow-slate-900/20 backdrop-blur-sm transition-colors duration-200 hover:border-slate-600 hover:bg-slate-800/80 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex flex-col gap-4 rounded-2xl border border-border/50 bg-muted/60 p-4 shadow-sm shadow-foreground/10 backdrop-blur-sm transition-colors duration-200 hover:border-border hover:bg-muted/80 sm:flex-row sm:items-center sm:justify-between">
                       <div className="flex flex-1 items-start gap-3 sm:items-center">
                         {item.type === "folder" ? (
                           <FolderCard
@@ -272,11 +272,11 @@ export default function DriveView() {
                         )}
                       </div>
                       {item.type === "file" && (
-                        <div className="flex flex-wrap items-center gap-3 text-sm text-slate-400 sm:justify-end">
-                          <span className="rounded-full bg-slate-900/60 px-3 py-1 text-xs font-medium text-slate-300 sm:bg-transparent sm:px-0 sm:py-0">
+                        <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground sm:justify-end">
+                          <span className="rounded-full bg-background/80 px-3 py-1 text-xs font-medium text-muted-foreground sm:bg-transparent sm:px-0 sm:py-0">
                             {new Date(item.createdAt).toLocaleDateString()}
                           </span>
-                          <span className="rounded-full bg-slate-900/60 px-3 py-1 text-xs font-medium text-slate-300 sm:bg-transparent sm:px-0 sm:py-0">
+                          <span className="rounded-full bg-background/80 px-3 py-1 text-xs font-medium text-muted-foreground sm:bg-transparent sm:px-0 sm:py-0">
                             {formatBytes(item.size)}
                           </span>
                           <DropdownMenu>
@@ -284,32 +284,32 @@ export default function DriveView() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-9 w-9 rounded-full text-slate-400 transition-colors duration-200 hover:bg-slate-700 hover:text-white"
+                                className="h-9 w-9 rounded-full text-muted-foreground transition-colors duration-200 hover:bg-muted hover:text-foreground"
                               >
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-44 rounded-xl border border-slate-700/60 bg-slate-800/95 text-slate-200 backdrop-blur">
-                              <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700">
+                            <DropdownMenuContent align="end" className="w-44 rounded-xl border border-border/60 bg-popover text-foreground backdrop-blur">
+                              <DropdownMenuItem className="hover:bg-muted focus:bg-muted">
                                 Open
                               </DropdownMenuItem>
-                              <DropdownMenuItem className="hover:bg-slate-700 focus:bg-slate-700">
+                              <DropdownMenuItem className="hover:bg-muted focus:bg-muted">
                                 Share
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                className="hover:bg-slate-700 focus:bg-slate-700"
+                                className="hover:bg-muted focus:bg-muted"
                                 onClick={() => handleDownload(item)}
                               >
                                 Download
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                className="hover:bg-slate-700 focus:bg-slate-700"
+                                className="hover:bg-muted focus:bg-muted"
                                 onClick={() => handleRename(item)}
                               >
                                 Rename
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20"
+                                className="text-destructive hover:bg-destructive/10 focus:bg-destructive/10"
                                 onClick={() => handleDelete(item.id)}
                               >
                                 Delete
@@ -319,20 +319,20 @@ export default function DriveView() {
                         </div>
                       )}
                       {item.type === "folder" && (
-                        <div className="flex flex-wrap items-center gap-3 text-sm text-slate-400 sm:justify-end">
+                        <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground sm:justify-end">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-9 w-9 rounded-full text-slate-400 transition-colors duration-200 hover:bg-slate-700 hover:text-white"
+                                className="h-9 w-9 rounded-full text-muted-foreground transition-colors duration-200 hover:bg-muted hover:text-foreground"
                               >
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-40 rounded-xl border border-slate-700/60 bg-slate-800/95 text-slate-200 backdrop-blur">
+                            <DropdownMenuContent align="end" className="w-40 rounded-xl border border-border/60 bg-popover text-foreground backdrop-blur">
                               <DropdownMenuItem
-                                className="hover:bg-slate-700 focus:bg-slate-700"
+                                className="hover:bg-muted focus:bg-muted"
                                 onClick={() => {
                                   const name = window.prompt("Rename folder", item.name)
                                   if (name) renameFolder(item.id, name)
@@ -341,7 +341,7 @@ export default function DriveView() {
                                 Rename
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                className="text-red-400 hover:bg-red-900/20 focus:bg-red-900/20"
+                                className="text-destructive hover:bg-destructive/10 focus:bg-destructive/10"
                                 onClick={() => {
                                   if (window.confirm("Delete folder?")) deleteFolder(item.id)
                                 }}

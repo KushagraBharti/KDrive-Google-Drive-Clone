@@ -1,8 +1,9 @@
-import { Cloud, FolderPlus, Grid3X3, List, Search } from "lucide-react"
+import { Cloud, FolderPlus, Grid3X3, List, Moon, Search, Sun } from "lucide-react"
 import UploadButton from "./UploadButton"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
 import { useAuth } from "@/hooks/useAuth"
+import { useTheme } from "@/contexts/ThemeContext"
 
 type ViewMode = "grid" | "list"
 
@@ -26,22 +27,23 @@ export default function Navbar({
   onUploadComplete,
 }: NavbarProps) {
   const { signOut } = useAuth()
+  const { theme, toggleTheme } = useTheme()
 
   return (
-    <header className="sticky top-0 z-20 border-b border-slate-700/60 bg-slate-900/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-20 border-b border-border/60 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-6">
           <div className="flex items-center gap-2">
-            <Cloud className="h-6 w-6 text-white" />
-            <span className="text-xl font-semibold tracking-tight text-white">KDrive</span>
+            <Cloud className="h-6 w-6 text-primary" />
+            <span className="text-xl font-semibold tracking-tight text-foreground">KDrive</span>
           </div>
           <div className="relative w-full min-w-[16rem] max-w-xl lg:w-96">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Search in Drive"
               value={searchQuery}
               onChange={(event) => onSearchChange(event.target.value)}
-              className="h-11 w-full rounded-xl border-slate-600 bg-slate-800/70 pl-10 text-sm text-slate-100 placeholder:text-slate-400 focus:border-slate-500 focus:bg-slate-800 focus-visible:ring-0"
+              className="h-11 w-full rounded-xl border border-input bg-muted/70 pl-10 text-sm text-foreground shadow-none transition-colors focus:bg-background focus-visible:ring-0"
             />
           </div>
         </div>
@@ -49,8 +51,18 @@ export default function Navbar({
           <Button
             variant="outline"
             size="icon"
+            onClick={toggleTheme}
+            aria-label="Toggle theme"
+            aria-pressed={theme === "dark"}
+            className="h-11 w-11 rounded-full border border-input bg-muted/60 text-foreground transition-colors duration-200 hover:bg-muted"
+          >
+            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
             onClick={onToggleView}
-            className="h-11 w-11 rounded-full border-slate-600 bg-slate-800/70 text-slate-200 transition-colors duration-200 hover:bg-slate-700 hover:text-white"
+            className="h-11 w-11 rounded-full border border-input bg-muted/60 text-foreground transition-colors duration-200 hover:bg-muted"
             aria-label="Toggle view"
           >
             {viewMode === "grid" ? (
@@ -62,7 +74,7 @@ export default function Navbar({
           <UploadButton
             parentId={currentFolderId}
             onUploaded={onUploadComplete}
-            className="w-full min-[420px]:w-auto rounded-xl bg-slate-700/60 text-sm font-medium text-slate-100 transition-colors duration-200 hover:bg-slate-600"
+            className="w-full min-[420px]:w-auto rounded-xl bg-muted text-sm font-medium text-foreground transition-colors duration-200 hover:bg-muted/80"
           />
           <Button
             onClick={onCreateFolder}
