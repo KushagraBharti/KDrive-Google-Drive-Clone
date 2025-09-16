@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useParams, useNavigate, useLocation } from "react-router-dom"
 import FolderCard from "@/components/FolderCard"
 import FileCard from "@/components/FileCard"
+import SkeletonCard from "@/components/SkeletonCard"
 import Breadcrumb, { Crumb } from "@/components/Breadcrumb"
 import Navbar from "@/components/Navbar"
 import { useFolders } from "@/hooks/useFolders"
@@ -37,21 +38,40 @@ export default function DriveView() {
 
   const currentFolderId = folderId === "root" ? 0 : Number(folderId)
 
-  const { folders, refetch: refetchFolders, renameFolder, deleteFolder } = useFolders(
+  const {
+    folders,
+    isLoading: foldersLoading,
+    refetch: refetchFolders,
+    renameFolder,
+    deleteFolder,
+  } = useFolders(
     currentFolderId === 0 ? null : currentFolderId,
   )
-  const { files, refetch } = useFiles(currentFolderId)
+  const { files, isLoading: filesLoading, refetch } = useFiles(currentFolderId)
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [searchQuery, setSearchQuery] = useState("")
   const [breadcrumbs, setBreadcrumbs] = useState<Crumb[]>([
     { id: null, name: "My Drive" },
   ])
+  const [isContentVisible, setIsContentVisible] = useState(false)
+
+  const isLoading = foldersLoading || filesLoading
 
   useEffect(() => {
     const crumbs = (location.state as any)?.breadcrumbs as Crumb[] | undefined
     setBreadcrumbs(crumbs ?? [{ id: null, name: "My Drive" }])
   }, [folderId, location.state])
+
+  useEffect(() => {
+    if (isLoading) {
+      setIsContentVisible(false)
+      return
+    }
+
+    const timeout = window.setTimeout(() => setIsContentVisible(true), 50)
+    return () => window.clearTimeout(timeout)
+  }, [isLoading])
 
   const filteredFolders = folders.filter((f) =>
     f.name.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -135,6 +155,11 @@ export default function DriveView() {
   ]
 
   const toggleViewMode = () => setViewMode((mode) => (mode === "grid" ? "list" : "grid"))
+  const layoutClass =
+    viewMode === "grid"
+      ? "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6"
+      : "flex flex-col gap-3"
+  const skeletonCount = viewMode === "grid" ? 8 : 5
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
@@ -152,7 +177,13 @@ export default function DriveView() {
         <div className="space-y-6">
           <Breadcrumb crumbs={breadcrumbs} onNavigate={navigateToBreadcrumb} />
 
-          {items.length === 0 ? (
+          {isLoading ? (
+            <div className={layoutClass}>
+              {Array.from({ length: skeletonCount }).map((_, index) => (
+                <SkeletonCard key={index} view={viewMode} />
+              ))}
+            </div>
+          ) : items.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-700/60 bg-slate-800/40 px-4 py-12 text-center shadow-inner shadow-slate-900/40">
               <FolderIcon className="mb-4 h-16 w-16 text-slate-600" />
               <p className="text-base text-slate-400 sm:text-lg">
@@ -161,11 +192,9 @@ export default function DriveView() {
             </div>
           ) : (
             <div
-              className={
-                viewMode === "grid"
-                  ? "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6"
-                  : "flex flex-col gap-3"
-              }
+              className={`${layoutClass} transition-opacity duration-500 ${
+                isContentVisible ? "opacity-100" : "opacity-0"
+              }`}
             >
               {items.map((item, index) => (
                 <div
