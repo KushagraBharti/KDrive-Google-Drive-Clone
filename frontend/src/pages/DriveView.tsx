@@ -24,6 +24,7 @@ import { CreateFolderDialog } from "@/components/CreateFolderDialog"
 import { RenameItemDialog } from "@/components/RenameItemDialog"
 import type { RenameableItem } from "@/components/RenameItemDialog"
 import { DeleteItemDialog } from "@/components/DeleteItemDialog"
+import { PreviewDialog, type PreviewDialogProps } from "@/components/PreviewDialog"
 
 type DriveItem = RenameableItem
 
@@ -66,6 +67,7 @@ export default function DriveView() {
   const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false)
   const [itemToRename, setItemToRename] = useState<DriveItem | null>(null)
   const [itemToDelete, setItemToDelete] = useState<DriveItem | null>(null)
+  const [previewFile, setPreviewFile] = useState<PreviewDialogProps["file"]>(null)
 
   const isLoading = foldersLoading || filesLoading
 
@@ -199,6 +201,7 @@ export default function DriveView() {
                             view="grid"
                             size={formatBytes(item.size)}
                             modified={new Date(item.createdAt).toLocaleDateString()}
+                            onClick={() => setPreviewFile(item)}
                           />
                         )}
                         {item.type === "folder" && (
@@ -257,6 +260,7 @@ export default function DriveView() {
                             view="list"
                             size={formatBytes(item.size)}
                             modified={new Date(item.createdAt).toLocaleDateString()}
+                            onClick={() => setPreviewFile(item)}
                           />
                         )}
                       </div>
@@ -281,6 +285,12 @@ export default function DriveView() {
                             <DropdownMenuContent align="end" className="w-44 rounded-xl border border-border/60 bg-popover text-foreground backdrop-blur">
                               <DropdownMenuItem className="hover:bg-muted focus:bg-muted">
                                 Open
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="hover:bg-muted focus:bg-muted"
+                                onClick={() => setPreviewFile(item)}
+                              >
+                                Preview
                               </DropdownMenuItem>
                               <DropdownMenuItem className="hover:bg-muted focus:bg-muted">
                                 Share
@@ -393,6 +403,13 @@ export default function DriveView() {
         item={itemToDelete}
         authToken={token}
         onDeleted={handleItemMutationRefresh}
+      />
+      <PreviewDialog
+        open={Boolean(previewFile)}
+        onOpenChange={(open) => {
+          if (!open) setPreviewFile(null)
+        }}
+        file={previewFile}
       />
     </div>
   )
