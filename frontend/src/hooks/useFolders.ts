@@ -1,23 +1,34 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from './useAuth';
 
 export function useFolders(parentId: number | null) {
   const { session } = useAuth();
   const [folders, setFolders] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const fetchFolders = async () => {
-    if (!session) return;
-    const token = session.access_token;
-    const res = await fetch(`/api/folders/${parentId ?? ''}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const data = await res.json();
-    setFolders(data);
-  };
+  const fetchFolders = useCallback(async () => {
+    if (!session) {
+      setFolders([]);
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const token = session.access_token;
+      const res = await fetch(`/api/folders/${parentId ?? ''}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      setFolders(data);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [parentId, session]);
 
   useEffect(() => {
     fetchFolders();
-  }, [parentId, session]);
+  }, [fetchFolders]);
 
 
   const renameFolder = async (id: number, name: string) => {
@@ -46,5 +57,5 @@ export function useFolders(parentId: number | null) {
     setFolders((prev) => prev.filter((f) => f.id !== id));
   };
 
-  return { folders, refetch: fetchFolders, renameFolder, deleteFolder };
+  return { folders, isLoading, refetch: fetchFolders, renameFolder, deleteFolder };
 }
