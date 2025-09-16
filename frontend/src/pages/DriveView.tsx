@@ -21,6 +21,11 @@ import { Folder as FolderIcon, MoreVertical } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
 import { supabaseClient } from "@/contexts/SupabaseContext"
 import { CreateFolderDialog } from "@/components/CreateFolderDialog"
+import { RenameItemDialog } from "@/components/RenameItemDialog"
+import type { RenameableItem } from "@/components/RenameItemDialog"
+import { DeleteItemDialog } from "@/components/DeleteItemDialog"
+
+type DriveItem = RenameableItem
 
 function formatBytes(bytes: number) {
   if (bytes === 0) return "0 B"
@@ -43,12 +48,14 @@ export default function DriveView() {
     folders,
     isLoading: foldersLoading,
     refetch: refetchFolders,
-    renameFolder,
-    deleteFolder,
   } = useFolders(
     currentFolderId === 0 ? null : currentFolderId,
   )
-  const { files, isLoading: filesLoading, refetch } = useFiles(currentFolderId)
+  const {
+    files,
+    isLoading: filesLoading,
+    refetch: refetchFiles,
+  } = useFiles(currentFolderId)
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [searchQuery, setSearchQuery] = useState("")
@@ -57,6 +64,8 @@ export default function DriveView() {
   ])
   const [isContentVisible, setIsContentVisible] = useState(false)
   const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false)
+  const [itemToRename, setItemToRename] = useState<DriveItem | null>(null)
+  const [itemToDelete, setItemToDelete] = useState<DriveItem | null>(null)
 
   const isLoading = foldersLoading || filesLoading
 
@@ -99,14 +108,16 @@ export default function DriveView() {
 
   const handleCreateFolder = () => setIsCreateFolderOpen(true)
 
-  const handleDelete = async (id: number) => {
-    if (!token) return
-    await fetch(`/api/files/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    refetch()
+  const handleItemMutationRefresh = async (item: DriveItem) => {
+    if (item.type === "folder") {
+      await refetchFolders()
+    } else {
+      await refetchFiles()
+    }
   }
+
+  const openRenameDialog = (item: DriveItem) => setItemToRename(item)
+  const openDeleteDialog = (item: DriveItem) => setItemToDelete(item)
 
   const handleDownload = async (file: any) => {
     const { data } = await supabaseClient.storage.from("files").download(file.path)
@@ -118,21 +129,6 @@ export default function DriveView() {
       a.click()
       URL.revokeObjectURL(url)
     }
-  }
-
-  const handleRename = async (file: any) => {
-    if (!token) return
-    const newName = window.prompt("Enter new name", file.name)
-    if (!newName || newName === file.name) return
-    await fetch(`/api/files/${file.id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ name: newName }),
-    })
-    refetch()
   }
 
   const items = [
@@ -156,7 +152,7 @@ export default function DriveView() {
         onToggleView={toggleViewMode}
         onCreateFolder={handleCreateFolder}
         currentFolderId={currentFolderId}
-        onUploadComplete={refetch}
+        onUploadComplete={refetchFiles}
       />
 
       <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pb-12 pt-6 sm:px-6 lg:px-8">
@@ -219,18 +215,25 @@ export default function DriveView() {
                             <DropdownMenuContent align="end" className="w-40 rounded-xl border border-border/60 bg-popover text-foreground backdrop-blur">
                               <DropdownMenuItem
                                 className="hover:bg-muted focus:bg-muted"
-                                onClick={() => {
-                                  const name = window.prompt("Rename folder", item.name)
-                                  if (name) renameFolder(item.id, name)
-                                }}
+                                onClick={() =>
+                                  openRenameDialog({
+                                    id: item.id,
+                                    name: item.name,
+                                    type: "folder",
+                                  })
+                                }
                               >
                                 Rename
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 className="text-destructive hover:bg-destructive/10 focus:bg-destructive/10"
-                                onClick={() => {
-                                  if (window.confirm("Delete folder?")) deleteFolder(item.id)
-                                }}
+                                onClick={() =>
+                                  openDeleteDialog({
+                                    id: item.id,
+                                    name: item.name,
+                                    type: "folder",
+                                  })
+                                }
                               >
                                 Delete
                               </DropdownMenuItem>
@@ -290,13 +293,25 @@ export default function DriveView() {
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 className="hover:bg-muted focus:bg-muted"
-                                onClick={() => handleRename(item)}
+                                onClick={() =>
+                                  openRenameDialog({
+                                    id: item.id,
+                                    name: item.name,
+                                    type: "file",
+                                  })
+                                }
                               >
                                 Rename
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 className="text-destructive hover:bg-destructive/10 focus:bg-destructive/10"
-                                onClick={() => handleDelete(item.id)}
+                                onClick={() =>
+                                  openDeleteDialog({
+                                    id: item.id,
+                                    name: item.name,
+                                    type: "file",
+                                  })
+                                }
                               >
                                 Delete
                               </DropdownMenuItem>
@@ -319,18 +334,25 @@ export default function DriveView() {
                             <DropdownMenuContent align="end" className="w-40 rounded-xl border border-border/60 bg-popover text-foreground backdrop-blur">
                               <DropdownMenuItem
                                 className="hover:bg-muted focus:bg-muted"
-                                onClick={() => {
-                                  const name = window.prompt("Rename folder", item.name)
-                                  if (name) renameFolder(item.id, name)
-                                }}
+                                onClick={() =>
+                                  openRenameDialog({
+                                    id: item.id,
+                                    name: item.name,
+                                    type: "folder",
+                                  })
+                                }
                               >
                                 Rename
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 className="text-destructive hover:bg-destructive/10 focus:bg-destructive/10"
-                                onClick={() => {
-                                  if (window.confirm("Delete folder?")) deleteFolder(item.id)
-                                }}
+                                onClick={() =>
+                                  openDeleteDialog({
+                                    id: item.id,
+                                    name: item.name,
+                                    type: "folder",
+                                  })
+                                }
                               >
                                 Delete
                               </DropdownMenuItem>
@@ -353,6 +375,24 @@ export default function DriveView() {
         parentId={currentFolderId}
         authToken={token}
         onCreated={refetchFolders}
+      />
+      <RenameItemDialog
+        open={Boolean(itemToRename)}
+        onOpenChange={(open) => {
+          if (!open) setItemToRename(null)
+        }}
+        item={itemToRename}
+        authToken={token}
+        onRenamed={handleItemMutationRefresh}
+      />
+      <DeleteItemDialog
+        open={Boolean(itemToDelete)}
+        onOpenChange={(open) => {
+          if (!open) setItemToDelete(null)
+        }}
+        item={itemToDelete}
+        authToken={token}
+        onDeleted={handleItemMutationRefresh}
       />
     </div>
   )
