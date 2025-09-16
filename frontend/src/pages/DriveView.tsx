@@ -200,23 +200,23 @@ export default function DriveView() {
         onCreate={handleCreateFolder}
       />
       <div className="bg-slate-800/80 backdrop-blur-sm border-b border-slate-700/50 px-6 py-4 shadow-lg">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+        <div className="flex sm:flex-row flex-col sm:items-center sm:justify-between gap-2">
+          <div className="flex sm:flex-row flex-col sm:items-center gap-2 sm:gap-4">
             <div className="flex items-center space-x-2">
               <Cloud className="w-5 h-5 text-white" />
               <span className="text-lg font-bold text-white">KDrive</span>
             </div>
-            <div className="relative">
+            <div className="relative w-full sm:w-auto">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
               <Input
                 placeholder="Search in Drive"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 w-96 bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400 focus:bg-slate-700 focus:border-slate-500 transition-all duration-200"
+                className="pl-10 max-w-md w-full sm:w-96 bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400 focus:bg-slate-700 focus:border-slate-500 transition-all duration-200"
               />
             </div>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex sm:flex-row flex-col sm:items-center gap-2">
             <Button
               variant="outline"
               size="icon"
@@ -234,10 +234,11 @@ export default function DriveView() {
               <FolderPlus className="w-4 h-4 mr-2" />
               New Folder
             </Button>
-            <Button 
-              variant="default" 
-              onClick={signOut} 
-              className="w-28 h-9.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium transition-all duration-200">
+            <Button
+              variant="default"
+              onClick={signOut}
+              className="w-28 h-9.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium transition-all duration-200"
+            >
               Sign Out
             </Button>
           </div>
