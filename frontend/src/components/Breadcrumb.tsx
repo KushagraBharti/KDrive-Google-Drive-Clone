@@ -12,20 +12,18 @@ interface BreadcrumbProps {
 
 export default function Breadcrumb({ crumbs, onNavigate }: BreadcrumbProps) {
   return (
-    <div className="bg-slate-800/60 backdrop-blur-sm border-b border-slate-700/30 px-6 py-3">
-      <div className="flex items-center space-x-2 text-sm">
+    <div className="border-b border-border/40 bg-muted/60 px-6 py-3 backdrop-blur-sm">
+      <div className="flex items-center space-x-2 text-sm text-muted-foreground">
         {crumbs.map((crumb, index) => (
           <div key={index} className="flex items-center space-x-2 animate-in fade-in duration-200">
-            {index === 0 && <Home className="w-4 h-4 text-slate-400" />}
+            {index === 0 && <Home className="h-4 w-4" />}
             <button
               onClick={() => onNavigate(index)}
-              className="text-slate-300 hover:text-blue-400 transition-colors duration-200 font-medium"
+              className="font-medium text-foreground transition-colors duration-200 hover:text-primary"
             >
               {crumb.name}
             </button>
-            {index < crumbs.length - 1 && (
-              <ChevronRight className="w-4 h-4 text-slate-500" />
-            )}
+            {index < crumbs.length - 1 && <ChevronRight className="h-4 w-4" />}
           </div>
         ))}
       </div>

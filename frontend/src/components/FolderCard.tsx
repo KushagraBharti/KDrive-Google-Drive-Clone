@@ -19,14 +19,14 @@ export default function FolderCard({
       <button
         type="button"
         onClick={onClick}
-        className="flex flex-col items-center justify-center space-y-2 w-full"
+        className="flex w-full flex-col items-center justify-center space-y-2"
       >
         <Folder className="w-12 h-12 text-blue-400" />
-        <span className="text-sm font-medium text-slate-200 truncate w-full text-center">
+        <span className="w-full truncate text-center text-sm font-medium text-foreground">
           {name}
         </span>
         {modified && (
-          <span className="text-xs text-slate-400 truncate w-full text-center">
+          <span className="w-full truncate text-center text-xs text-muted-foreground">
             {modified}
           </span>
         )}
@@ -38,12 +38,12 @@ export default function FolderCard({
     <button
       type="button"
       onClick={onClick}
-      className="flex items-center space-x-3 text-left hover:bg-slate-800/40 p-2 rounded-md w-full"
+      className="flex w-full items-center space-x-3 rounded-md p-2 text-left transition-colors hover:bg-muted/60"
     >
       <Folder className="w-6 h-6 text-blue-400" />
       <div className="flex flex-col flex-1">
-        <span className="font-medium text-slate-200">{name}</span>
-        {modified && <span className="text-sm text-slate-400">{modified}</span>}
+        <span className="font-medium text-foreground">{name}</span>
+        {modified && <span className="text-sm text-muted-foreground">{modified}</span>}
       </div>
     </button>
   )

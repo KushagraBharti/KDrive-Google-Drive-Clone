@@ -53,35 +53,35 @@ export default function SignInPage() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+    <div className="relative flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-muted/30 to-background p-4 text-foreground">
       {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-blue-500/10 blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-purple-500/10 blur-3xl" />
       </div>
 
       <div className="relative w-full max-w-md">
         {/* Back to home button */}
         <Button
           variant="ghost"
-          className="mb-6 text-slate-400 hover:text-white hover:bg-slate-800 transition-all duration-200"
+          className="mb-6 text-muted-foreground transition-all duration-200 hover:bg-muted hover:text-foreground"
           onClick={() => navigate("/")}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Home
         </Button>
 
-        <Card className="bg-slate-800/80 backdrop-blur-sm border-slate-700/50 shadow-2xl">
-          <CardHeader className="text-center pb-6">
-            <div className="flex justify-center mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                <Cloud className="w-7 h-7 text-white" />
+        <Card className="border border-border/60 bg-card/80 shadow-2xl backdrop-blur-sm">
+          <CardHeader className="pb-6 text-center">
+            <div className="mb-4 flex justify-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-purple-600">
+                <Cloud className="h-7 w-7 text-white" />
               </div>
             </div>
-            <CardTitle className="text-2xl font-bold text-white">
+            <CardTitle className="text-2xl font-bold text-foreground">
               {isSignUp ? "Create your account" : "Welcome back"}
             </CardTitle>
-            <p className="text-slate-400 mt-2">
+            <p className="mt-2 text-muted-foreground">
               {isSignUp ? "Sign up to start using KDrive" : "Sign in to access your files"}
             </p>
           </CardHeader>
@@ -91,7 +91,7 @@ export default function SignInPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               {isSignUp && (
                 <div className="space-y-2">
-                  <Label htmlFor="name" className="text-slate-300">
+                  <Label htmlFor="name" className="text-sm font-medium text-foreground">
                     Full Name
                   </Label>
                   <Input
@@ -100,14 +100,14 @@ export default function SignInPage() {
                     placeholder="Enter your full name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400 focus:bg-slate-700 focus:border-slate-500 transition-all duration-200"
+                    className="bg-card/70 text-foreground placeholder:text-muted-foreground transition-all duration-200 focus:bg-background"
                     required={isSignUp}
                   />
                 </div>
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-slate-300">
+                <Label htmlFor="email" className="text-sm font-medium text-foreground">
                   Email
                 </Label>
                 <Input
@@ -116,13 +116,13 @@ export default function SignInPage() {
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400 focus:bg-slate-700 focus:border-slate-500 transition-all duration-200"
+                  className="bg-card/70 text-foreground placeholder:text-muted-foreground transition-all duration-200 focus:bg-background"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-slate-300">
+                <Label htmlFor="password" className="text-sm font-medium text-foreground">
                   Password
                 </Label>
                 <div className="relative">
@@ -132,14 +132,14 @@ export default function SignInPage() {
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400 focus:bg-slate-700 focus:border-slate-500 transition-all duration-200 pr-10"
+                    className="pr-10 bg-card/70 text-foreground placeholder:text-muted-foreground transition-all duration-200 focus:bg-background"
                     required
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="absolute right-0 top-0 h-full px-3 text-slate-400 hover:text-white"
+                    className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:text-foreground"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -166,8 +166,8 @@ export default function SignInPage() {
             </form>
 
             {/* Toggle Sign Up/Sign In */}
-            <div className="text-center pt-4 border-t border-slate-700">
-              <p className="text-slate-400">
+            <div className="border-t border-border/60 pt-4 text-center">
+              <p className="text-muted-foreground">
                 {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
                 <Button
                   variant="link"
@@ -182,14 +182,14 @@ export default function SignInPage() {
         </Card>
 
         {/* Footer */}
-        <div className="text-center mt-8 text-slate-400 text-sm">
+        <div className="mt-8 text-center text-sm text-muted-foreground">
           <p>
             By continuing, you agree to our{" "}
-            <a href="#" className="text-blue-400 hover:text-blue-300 transition-colors duration-200">
+            <a href="#" className="text-primary hover:text-primary/80 transition-colors duration-200">
               Terms of Service
             </a>{" "}
             and{" "}
-            <a href="#" className="text-blue-400 hover:text-blue-300 transition-colors duration-200">
+            <a href="#" className="text-primary hover:text-primary/80 transition-colors duration-200">
               Privacy Policy
             </a>
           </p>

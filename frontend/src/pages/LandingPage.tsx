@@ -56,20 +56,20 @@ export default function LandingPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background text-foreground">
       {/* Navigation */}
-      <nav className="bg-slate-800/80 backdrop-blur-sm border-b border-slate-700/50 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <nav className="border-b border-border/50 bg-card/80 px-6 py-4 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-7xl items-center justify-between">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <Cloud className="w-5 h-5 text-white" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600">
+              <Cloud className="h-5 w-5 text-white" />
             </div>
-            <span className="text-2xl font-bold text-white">KDrive</span>
+            <span className="text-2xl font-bold text-foreground">KDrive</span>
           </div>
           <div className="flex items-center space-x-4">
             <Button
               variant="outline"
-              className="bg-slate-700/50 border-slate-600 text-slate-300 hover:bg-slate-600 hover:text-white transition-all duration-200"
+              className="rounded-xl bg-card/60 text-foreground transition-colors duration-200 hover:bg-accent hover:text-accent-foreground"
               onClick={() => navigate('/signin')}
             >
               Sign In
@@ -82,13 +82,13 @@ export default function LandingPage() {
       <section className="px-6 py-20">
         <div className="max-w-7xl mx-auto text-center">
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight">
+            <h1 className="mb-6 text-5xl font-bold tracking-tight text-foreground md:text-7xl">
               Your files,{" "}
               <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-emerald-400 bg-clip-text text-transparent">
                 everywhere
               </span>
             </h1>
-            <p className="text-xl text-slate-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+            <p className="mx-auto mb-8 max-w-3xl text-xl leading-relaxed text-muted-foreground">
               Store, sync, and share your files with the most elegant cloud storage solution. Experience seamless
               collaboration with enterprise-grade security.
             </p>
@@ -107,25 +107,25 @@ export default function LandingPage() {
                 className={`w-5 h-5 ml-2 transition-transform duration-200 ${isHovered ? "translate-x-1" : ""}`}
               />
             </Button>
-            <p className="text-slate-400 mt-4">No credit card required • 15GB free storage</p>
+            <p className="mt-4 text-muted-foreground">No credit card required • 15GB free storage</p>
           </div>
 
           {/* Hero Visual */}
           <div className="mt-16 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-400">
             <div className="relative max-w-4xl mx-auto">
-              <div className="bg-gradient-to-r from-slate-800/60 to-slate-700/60 backdrop-blur-sm rounded-2xl border border-slate-600/50 p-8 shadow-2xl">
+              <div className="rounded-2xl border border-border/60 bg-gradient-to-r from-card/70 to-card/60 p-8 shadow-2xl backdrop-blur-sm">
                 <div className="grid items-center justify-center grid-cols-3 gap-4 mb-6">
-                  <div className="flex items-center space-x-2 bg-slate-700/50 rounded-lg p-3 hover:bg-slate-600 transition-all duration-200">
+                  <div className="flex items-center space-x-2 rounded-lg bg-muted/60 p-3 transition-all duration-200 hover:bg-muted/80">
                     <Folder className="w-6 h-6 text-blue-400" />
-                    <span className="text-slate-200 font-medium">Documents</span>
+                    <span className="font-medium text-foreground">Documents</span>
                   </div>
-                  <div className="flex items-center space-x-2 bg-slate-700/50 rounded-lg p-3 hover:bg-slate-600 transition-all duration-200">
+                  <div className="flex items-center space-x-2 rounded-lg bg-muted/60 p-3 transition-all duration-200 hover:bg-muted/80">
                     <Upload className="w-6 h-6 text-emerald-400" />
-                    <span className="text-slate-200 font-medium">Upload</span>
+                    <span className="font-medium text-foreground">Upload</span>
                   </div>
-                  <div className="flex items-center space-x-2 bg-slate-700/50 rounded-lg p-3 hover:bg-slate-600 transition-all duration-200">
+                  <div className="flex items-center space-x-2 rounded-lg bg-muted/60 p-3 transition-all duration-200 hover:bg-muted/80">
                     <Share className="w-6 h-6 text-purple-400" />
-                    <span className="text-slate-200 font-medium">Share</span>
+                    <span className="font-medium text-foreground">Share</span>
                   </div>
                 </div>
               </div>
@@ -135,26 +135,26 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className="px-6 py-20 bg-slate-800/30">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4">Why choose KDrive?</h2>
-            <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+      <section className="bg-muted/30 px-6 py-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-16 text-center">
+            <h2 className="mb-4 text-4xl font-bold text-foreground">Why choose KDrive?</h2>
+            <p className="mx-auto max-w-2xl text-xl text-muted-foreground">
               Built for modern teams who demand both beauty and functionality in their tools.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             {features.map((feature, index) => (
               <Card
                 key={index}
-                className="h-64 flex items-center justify-center bg-slate-800/60 border-slate-700/50 hover:bg-slate-700/60 hover:border-slate-600 transition-all duration-300 transform hover:scale-105 animate-in fade-in slide-in-from-bottom-4 bg-center"
+                className="flex h-64 items-center justify-center border border-border/60 bg-card/70 transition-all duration-300 hover:-translate-y-1 hover:border-border hover:bg-card animate-in fade-in slide-in-from-bottom-4"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <CardContent className="flex flex-col items-center justify-center p-6 text-center w-full h-full">
-                  <div className="mb-4 flex justify-center items-center w-full">{feature.icon}</div>
-                  <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
-                  <p className="text-slate-300 leading-relaxed">{feature.description}</p>
+                <CardContent className="flex h-full w-full flex-col items-center justify-center p-6 text-center">
+                  <div className="mb-4 flex w-full items-center justify-center">{feature.icon}</div>
+                  <h3 className="mb-2 text-xl font-semibold text-foreground">{feature.title}</h3>
+                  <p className="leading-relaxed text-muted-foreground">{feature.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -164,28 +164,28 @@ export default function LandingPage() {
 
       {/* Testimonials Section */}
       <section className="px-6 py-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4">Loved by thousands</h2>
-            <p className="text-xl text-slate-300">See what our users have to say about KDrive.</p>
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-16 text-center">
+            <h2 className="mb-4 text-4xl font-bold text-foreground">Loved by thousands</h2>
+            <p className="text-xl text-muted-foreground">See what our users have to say about KDrive.</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid gap-8 md:grid-cols-3">
             {testimonials.map((testimonial, index) => (
               <Card
                 key={index}
-                className="h-64 bg-slate-800/60 border-slate-700/50 hover:bg-slate-700/60 transition-all duration-300 animate-in fade-in slide-in-from-bottom-4"
+                className="h-64 border border-border/60 bg-card/70 transition-all duration-300 hover:-translate-y-1 hover:border-border hover:bg-card animate-in fade-in slide-in-from-bottom-4"
                 style={{ animationDelay: `${index * 150}ms` }}
               >
-                <CardContent className="flex flex-col items-center justify-center p-6 text-center w-full h-full">
-                  <div className="flex mb-4 justify-center items-center w-full">
+                <CardContent className="flex h-full w-full flex-col items-center justify-center p-6 text-center">
+                  <div className="mb-4 flex w-full items-center justify-center">
                     {[...Array(testimonial.rating)].map((_, i) => (
                       <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
                     ))}
                   </div>
-                  <p className="text-slate-300 mb-4 italic">"{testimonial.content}"</p>
+                  <p className="mb-4 italic text-muted-foreground">"{testimonial.content}"</p>
                   <div>
-                    <p className="text-white font-semibold">{testimonial.name}</p>
-                    <p className="text-slate-400 text-sm">{testimonial.role}</p>
+                    <p className="font-semibold text-foreground">{testimonial.name}</p>
+                    <p className="text-sm text-muted-foreground">{testimonial.role}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -195,10 +195,10 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="px-6 py-20 bg-gradient-to-r from-blue-900/20 to-purple-900/20">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-white mb-4">Ready to get started?</h2>
-          <p className="text-xl text-slate-300 mb-8">
+      <section className="bg-gradient-to-r from-primary/20 to-accent/20 px-6 py-20">
+        <div className="mx-auto max-w-4xl text-center">
+          <h2 className="mb-4 text-4xl font-bold text-foreground">Ready to get started?</h2>
+          <p className="mb-8 text-xl text-muted-foreground">
             Join thousands of users who trust KDrive with their most important files.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -212,7 +212,7 @@ export default function LandingPage() {
             <Button
               size="lg"
               variant="outline"
-              className="bg-slate-700/50 border-slate-600 text-slate-300 hover:bg-slate-600 hover:text-white px-8 py-4 text-lg font-semibold transition-all duration-300"
+              className="rounded-xl bg-card/60 text-foreground transition-all duration-300 hover:bg-accent hover:text-accent-foreground px-8 py-4 text-lg font-semibold"
             >
               View Pricing
             </Button>
@@ -221,23 +221,23 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-900/80 border-t border-slate-700/50 px-6 py-12">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <Cloud className="w-5 h-5 text-white" />
+      <footer className="border-t border-border/60 bg-card/80 px-6 py-12">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
+            <div className="flex items-center space-x-2 md:mb-0">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600">
+                <Cloud className="h-5 w-5 text-white" />
               </div>
-              <span className="text-2xl font-bold text-white">KDrive</span>
+              <span className="text-2xl font-bold text-foreground">KDrive</span>
             </div>
-            <div className="flex items-center space-x-6 text-slate-400">
-              <a href="#" className="hover:text-white transition-colors duration-200">
+            <div className="flex items-center space-x-6 text-muted-foreground">
+              <a href="#" className="transition-colors duration-200 hover:text-foreground">
                 Privacy
               </a>
-              <a href="#" className="hover:text-white transition-colors duration-200">
+              <a href="#" className="transition-colors duration-200 hover:text-foreground">
                 Terms
               </a>
-              <a href="#" className="hover:text-white transition-colors duration-200">
+              <a href="#" className="transition-colors duration-200 hover:text-foreground">
                 Support
               </a>
               <span>© 2024 KDrive. All rights reserved.</span>
