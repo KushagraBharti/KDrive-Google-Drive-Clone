@@ -10,7 +10,7 @@ import { supabaseClient } from "@/contexts/SupabaseContext"
 import { Loader2, FileWarning } from "lucide-react"
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist/build/pdf"
 import type { PDFDocumentProxy } from "pdfjs-dist/types/src/display/api"
-import pdfWorkerSrc from "pdfjs-dist/build/pdf.worker.min.js?url"
+import pdfWorkerSrc from "pdfjs-dist/build/pdf.worker.min.mjs?url"
 
 GlobalWorkerOptions.workerSrc = pdfWorkerSrc
 
